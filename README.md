@@ -1,6 +1,6 @@
 # TileDB Jupyterlab Prompt User Options
 
-Custom Jupyterlab widget for TileDB to prompt the user for notebook creation options including:
+Custom TileDB Jupyterlab notebook extension for to prompt the user for notebook creation options:
 
 - Notebook name
 - S3 Path
