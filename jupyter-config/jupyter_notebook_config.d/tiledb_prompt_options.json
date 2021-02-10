@@ -1,0 +1,7 @@
+{
+  "NotebookApp": {
+    "nbserver_extensions": {
+      "tiledb_prompt_options": true
+    }
+  }
+}
