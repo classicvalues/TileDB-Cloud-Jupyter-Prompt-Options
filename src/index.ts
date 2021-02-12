@@ -163,4 +163,3 @@ function activate(app: JupyterFrontEnd,
 }
 
 export default extension;
-export {activate as _activate};
