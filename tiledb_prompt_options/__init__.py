@@ -15,5 +15,5 @@ def load_jupyter_server_extension(lab_app):
     url_path = "get_access_token"
     setup_handlers(lab_app.web_app, url_path)
     lab_app.log.info(
-        "Registered set_access_token extension at URL path /{}".format(url_path)
+        "Registered route path /{}".format(url_path)
     )

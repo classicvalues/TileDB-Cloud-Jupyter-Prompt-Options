@@ -93,7 +93,7 @@ function activate(app: JupyterFrontEnd,
   app.commands.addCommand(open_command, {
     caption: "Prompt the user for TileDB notebook options",
     execute: async () => {
-      const data = await requestAPI();
+      const data: any = await requestAPI();
 
       const config = {
         apiKey: data.token

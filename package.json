@@ -4,6 +4,7 @@
   "description": "TileDB notebook extension to prompt user for notebook options",
   "author": "TileDB, Inc.",
   "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/TileDB-Inc/TileDB-Cloud-Jupyter-Prompt-Options.git"
