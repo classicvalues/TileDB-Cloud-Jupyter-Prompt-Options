@@ -22,6 +22,10 @@ import {
   Widget,
 } from "@lumino/widgets";
 
+import { requestAPI } from './handler';
+
+import { UserApi } from '@tiledb-inc/tiledb-cloud';
+
 const extension: JupyterFrontEndPlugin<void> = {
   activate,
   autoStart: true,
@@ -88,12 +92,24 @@ function activate(app: JupyterFrontEnd,
 
   app.commands.addCommand(open_command, {
     caption: "Prompt the user for TileDB notebook options",
-    execute: (args) => {
+    execute: async () => {
+      const data = await requestAPI();
+
+      const config = {
+        apiKey: data.token
+      };
+      
+      const tileAPI = new UserApi(config);
+    
+      const userResponse = await tileAPI.getUser();
+    
+      console.log(userResponse);
+
       showDialog({
         body: new TileDBPromptOptionsWidget(),
         buttons: [Dialog.cancelButton(), Dialog.okButton({ label: "GO" })],
         title: "TileDB Notebook Options",
-      }).then((result) => {
+      }).then((result : any) => {
         var results = result.value.split(" ");
         if (result.button.label === "Cancel") {
           return;
@@ -112,7 +128,7 @@ function activate(app: JupyterFrontEnd,
               path: path,
               type: "notebook",
               options: JSON.stringify(tiledb_options_json)
-            }).then((model) => {
+            }).then((model: any) => {
                 app.commands.execute(
                   "docmanager:open", {
                   factory: "Notebook", 
