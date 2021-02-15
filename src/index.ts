@@ -18,13 +18,11 @@ import {
   IMainMenu,
 } from "@jupyterlab/mainmenu";
 
-import {
-  Widget,
-} from "@lumino/widgets";
 
 import { requestAPI } from './handler';
 
-import { UserApi } from '@tiledb-inc/tiledb-cloud';
+import { OrganizationUser, UserApi } from '@tiledb-inc/tiledb-cloud';
+import { TileDBPromptOptionsWidget } from "./TileDBPromptOptionsWidget";
 
 const extension: JupyterFrontEndPlugin<void> = {
   activate,
@@ -34,67 +32,20 @@ const extension: JupyterFrontEndPlugin<void> = {
   requires: [IMainMenu, IFileBrowserFactory],
 };
 
-export
-class TileDBPromptOptionsWidget extends Widget {
 
-  public constructor(options: {owners: string[], credentials: any[]}) {
-    const body = document.createElement("div");
+function getOrgNamesWithWritePermissions(orgs: OrganizationUser[]): string[] {
+  const orgNames: string[] = [];
 
-    const name_label = document.createElement("label");
-    name_label.textContent = "Name:";
-    const name_input = document.createElement("input");
-    name_input.setAttribute("type", "text");
-    name_input.setAttribute("value", "Untitled");
+  orgs.forEach(org => {
+    const orgName = (org as any).organization_name;
+    if (orgName !== 'public' && !!~(org as any).allowed_actions.indexOf('write' as any)) {
+      orgNames.push(orgName);
+    }
+  });
 
-    const s3_label = document.createElement("label");
-    s3_label.textContent = "S3 Path:";
-    const s3_input = document.createElement("input");
-    s3_input.setAttribute("type", "text");
-    s3_input.setAttribute("value", "s3://tiledb-user/notebooks");
-
-    const s3_cred_label = document.createElement("label");
-    s3_cred_label.textContent = "S3 Path Credentials:";
-    const s3_cred_input = document.createElement("select");
-    s3_cred_input.setAttribute("name", "tiledb-user-creds");
-    options.credentials.forEach((cred) => {
-      const option = document.createElement("option");
-      option.setAttribute("value", cred.name);
-      option.setAttribute("label", cred.name);
-      s3_cred_input.append(option);
-    });
-    
-    const owner_label = document.createElement("label");
-    owner_label.textContent = "Owner:";
-    const owner_input = document.createElement("select");
-
-    options.owners.forEach((owner) => {
-      const option = document.createElement("option");
-      option.setAttribute("value", owner);
-      option.setAttribute("label", owner);
-      owner_input.append(option);
-    })
-    owner_input.setAttribute("name", "user");
-
-    body.appendChild(name_label);
-    body.appendChild(name_input);
-    body.appendChild(s3_label);
-    body.appendChild(s3_input);
-    body.appendChild(s3_cred_label);
-    body.appendChild(s3_cred_input);
-    body.appendChild(owner_label);
-    body.appendChild(owner_input);
-
-    super({ node: body });
-  }
-
-  public getValue(): string {
-    let input_elem = this.node.getElementsByTagName("input");
-    let select_elem = this.node.getElementsByTagName("select");
-
-    return [input_elem[0].value, input_elem[1].value, 
-    select_elem[0].value, select_elem[1].value].join(" ");
-  }
+  return orgNames;
 }
+
 
 function activate(app: JupyterFrontEnd,
                   menu: IMainMenu,
@@ -116,19 +67,16 @@ function activate(app: JupyterFrontEnd,
       const username = userData.username;
       const credentialsResponse = await tileDBAPI.checkAWSAccessCredentials(username);
       const owners = [username];
-      const orgs =  userData.organizations || [];
+      const organizationsWithWritePermissions = getOrgNamesWithWritePermissions(userData.organizations || []);
+      const defaultS3Path = (userData as any).default_s3_path || 's3://tiledb-user/notebooks';
 
-      orgs.forEach(org => {
-        const orgName = (org as any).organization_name;
-        if (orgName !== 'public' && !!~(org as any).allowed_actions.indexOf('write' as any)) {
-          owners.push(orgName);
-        }
-      });
+      owners.push(...organizationsWithWritePermissions);
 
       showDialog({
         body: new TileDBPromptOptionsWidget({
           owners,
-          credentials: credentialsResponse.data || []
+          credentials: credentialsResponse.data || [],
+          defaultS3Path
         }),
         buttons: [Dialog.cancelButton(), Dialog.okButton({ label: "GO" })],
         title: "TileDB Notebook Options",
