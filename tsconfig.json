@@ -11,5 +11,5 @@
     "outDir": "./lib",
     "lib": ["es5", "es2015.promise", "dom", "es2015.collection", "es2015.iterable"],
   },
-  "include": ["src/*"]
+  "include": ["src/**/*"]
 }

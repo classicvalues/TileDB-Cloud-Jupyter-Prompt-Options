@@ -21,6 +21,7 @@
     "build:lab": "rimraf lab-dist && mkdirp lab-dist && cd lab-dist && npm pack ..",
     "build:all": "npm run build && npm run build:lab",
     "clean": "rimraf lib",
+    "watch": "tsc -w",
     "prepublishOnly": "npm run build"
   },
   "files": [
