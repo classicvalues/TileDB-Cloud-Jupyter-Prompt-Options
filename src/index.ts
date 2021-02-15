@@ -36,7 +36,8 @@ const extension: JupyterFrontEndPlugin<void> = {
 
 export
 class TileDBPromptOptionsWidget extends Widget {
-  public constructor() {
+
+  public constructor(options: {owners: string[], credentials: any[]}) {
     const body = document.createElement("div");
 
     const name_label = document.createElement("label");
@@ -53,17 +54,26 @@ class TileDBPromptOptionsWidget extends Widget {
 
     const s3_cred_label = document.createElement("label");
     s3_cred_label.textContent = "S3 Path Credentials:";
-    // const s3_cred_input = document.createElement("select");
-    const s3_cred_input = document.createElement("input");
-    s3_cred_input.setAttribute("type", "text");
-    s3_cred_input.setAttribute("value", "tiledb-user-creds");
+    const s3_cred_input = document.createElement("select");
+    s3_cred_input.setAttribute("name", "tiledb-user-creds");
+    options.credentials.forEach((cred) => {
+      const option = document.createElement("option");
+      option.setAttribute("value", cred.name);
+      option.setAttribute("label", cred.name);
+      s3_cred_input.append(option);
+    });
     
     const owner_label = document.createElement("label");
     owner_label.textContent = "Owner:";
-    // const owner_input = document.createElement("select");
-    const owner_input = document.createElement("input");
-    owner_input.setAttribute("type", "text");
-    owner_input.setAttribute("value", "user");
+    const owner_input = document.createElement("select");
+
+    options.owners.forEach((owner) => {
+      const option = document.createElement("option");
+      option.setAttribute("value", owner);
+      option.setAttribute("label", owner);
+      owner_input.append(option);
+    })
+    owner_input.setAttribute("name", "user");
 
     body.appendChild(name_label);
     body.appendChild(name_input);
@@ -79,8 +89,10 @@ class TileDBPromptOptionsWidget extends Widget {
 
   public getValue(): string {
     let input_elem = this.node.getElementsByTagName("input");
+    let select_elem = this.node.getElementsByTagName("select");
+
     return [input_elem[0].value, input_elem[1].value, 
-            input_elem[2].value, input_elem[3].value].join(" ");
+    select_elem[0].value, select_elem[1].value].join(" ");
   }
 }
 
@@ -94,19 +106,30 @@ function activate(app: JupyterFrontEnd,
     caption: "Prompt the user for TileDB notebook options",
     execute: async () => {
       const data: any = await requestAPI();
-
       const config = {
         apiKey: data.token
       };
-      
-      const tileAPI = new UserApi(config);
+      const tileDBAPI = new UserApi(config);
     
-      const userResponse = await tileAPI.getUser();
-    
-      console.log(userResponse);
+      const userResponse = await tileDBAPI.getUser();
+      const userData = userResponse.data;
+      const username = userData.username;
+      const credentialsResponse = await tileDBAPI.checkAWSAccessCredentials(username);
+      const owners = [username];
+      const orgs =  userData.organizations || [];
+
+      orgs.forEach(org => {
+        const orgName = (org as any).organization_name;
+        if (orgName !== 'public' && !!~(org as any).allowed_actions.indexOf('write' as any)) {
+          owners.push(orgName);
+        }
+      });
 
       showDialog({
-        body: new TileDBPromptOptionsWidget(),
+        body: new TileDBPromptOptionsWidget({
+          owners,
+          credentials: credentialsResponse.data || []
+        }),
         buttons: [Dialog.cancelButton(), Dialog.okButton({ label: "GO" })],
         title: "TileDB Notebook Options",
       }).then((result : any) => {
