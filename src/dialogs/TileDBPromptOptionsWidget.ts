@@ -1,16 +1,19 @@
-import { JupyterFrontEnd } from '@jupyterlab/application';
+import { JupyterFrontEnd } from "@jupyterlab/application";
 import { Widget } from "@lumino/widgets";
-
-import { Dialog, showDialog } from "@jupyterlab/apputils";
-import { CredentialsDialog } from "./CredentialsDialog";
-import getTileDBAPI from "../tiledbAPI";
-import showMainDialog from '../showMainDialog';
+import { openCredentialsDialog } from "../helpers/openDialogs";
 
 export interface Options {
   owners: string[];
-    credentials: any[];
-    defaultS3Path: string;
-    app: JupyterFrontEnd;
+  credentials: any[];
+  defaultS3Path: string;
+  app: JupyterFrontEnd;
+}
+
+export interface PromptDialogValue {
+  name: string;
+  s3_prefix: string;
+  s3_credentials: string;
+  owner: string;
 }
 
 export class TileDBPromptOptionsWidget extends Widget {
@@ -50,7 +53,9 @@ export class TileDBPromptOptionsWidget extends Widget {
     addCredentialsLink.onclick = () => {
       const username = options.owners[0];
       openCredentialsDialog(username, options);
-      const cancelButton: HTMLElement = document.body.querySelector('.jp-Dialog-button.jp-mod-reject');
+      const cancelButton: HTMLElement = document.body.querySelector(
+        ".jp-Dialog-button.jp-mod-reject"
+      );
       cancelButton.click();
     };
 
@@ -77,43 +82,15 @@ export class TileDBPromptOptionsWidget extends Widget {
     body.appendChild(owner_input);
   }
 
-  public getValue(): string {
+  public getValue(): PromptDialogValue {
     let input_elem = this.node.getElementsByTagName("input");
     let select_elem = this.node.getElementsByTagName("select");
 
-    return [
-      input_elem[0].value,
-      input_elem[1].value,
-      select_elem[0].value,
-      select_elem[1].value,
-    ].join(" ");
+    return {
+      name: input_elem[0].value,
+      s3_prefix: input_elem[1].value,
+      s3_credentials: select_elem[0].value,
+      owner: select_elem[1].value,
+    };
   }
-}
-
-function openCredentialsDialog(username: string, options: Options) {
-  showDialog({
-    body: new CredentialsDialog(),
-    buttons: [Dialog.cancelButton(), Dialog.okButton({ label: "Add" })],
-    title: "Add AWS credentials",
-  }).then(async (result: any) => {
-    if (result.button.label === "Cancel") {
-      return;
-    } else if (result.button.label === "Add") {
-      var [credentialName, credentialKey, credentialSecret] = result.value.split(" ");
-      const tileDBAPI = await getTileDBAPI();
-
-      await tileDBAPI.addAWSAccessCredentials(username, {
-        access_key_id: credentialKey,
-        name: credentialName,
-        secret_access_key: credentialSecret,
-      } as any);
-      const credentialsResponse = await tileDBAPI.checkAWSAccessCredentials(username);
-
-      showMainDialog({
-        ...options,
-        credentials: credentialsResponse.data || [],
-      });
-
-    }
-  });
 }

@@ -9,9 +9,9 @@ import { ILauncher } from "@jupyterlab/launcher";
 
 import { IMainMenu } from "@jupyterlab/mainmenu";
 
-import { OrganizationUser } from "@tiledb-inc/tiledb-cloud";
 import getTileDBAPI from "./tiledbAPI";
-import showMainDialog from "./showMainDialog";
+import { showMainDialog } from "./helpers/openDialogs";
+import getOrgNamesWithWritePermissions from "./helpers/getOrgNamesWithWritePermissions";
 
 const extension: JupyterFrontEndPlugin<void> = {
   activate,
@@ -20,22 +20,6 @@ const extension: JupyterFrontEndPlugin<void> = {
   optional: [ILauncher],
   requires: [IMainMenu, IFileBrowserFactory],
 };
-
-function getOrgNamesWithWritePermissions(orgs: OrganizationUser[]): string[] {
-  const orgNames: string[] = [];
-
-  orgs.forEach((org) => {
-    const orgName = (org as any).organization_name;
-    if (
-      orgName !== "public" &&
-      !!~(org as any).allowed_actions.indexOf("write" as any)
-    ) {
-      orgNames.push(orgName);
-    }
-  });
-
-  return orgNames;
-}
 
 function activate(
   app: JupyterFrontEnd,
@@ -98,5 +82,3 @@ function activate(
 }
 
 export default extension;
-
-

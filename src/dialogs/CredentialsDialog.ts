@@ -1,10 +1,12 @@
-import {
-    Widget,
-  } from "@lumino/widgets";
+import { Widget } from "@lumino/widgets";
 
-export
-class CredentialsDialog extends Widget {
+export interface CredentialsDialogValue {
+  credentialName: string;
+  credentialKey: string;
+  credentialSecret: string;
+}
 
+export class CredentialsDialog extends Widget {
   public constructor() {
     const body = document.createElement("div");
 
@@ -26,7 +28,6 @@ class CredentialsDialog extends Widget {
     secret_input.setAttribute("type", "text");
     secret_input.setAttribute("value", "");
 
-
     body.appendChild(name_label);
     body.appendChild(name_input);
     body.appendChild(key_label);
@@ -37,9 +38,13 @@ class CredentialsDialog extends Widget {
     super({ node: body });
   }
 
-  public getValue(): string {
+  public getValue(): CredentialsDialogValue {
     let input_elem = this.node.getElementsByTagName("input");
 
-    return [input_elem[0].value, input_elem[1].value,  input_elem[2].value].join(" ");
+    return {
+      credentialName: input_elem[0].value,
+      credentialKey: input_elem[1].value,
+      credentialSecret: input_elem[2].value,
+    };
   }
 }
