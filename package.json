@@ -20,6 +20,9 @@
     "build": "tsc",
     "build:lab": "rimraf lab-dist && mkdirp lab-dist && cd lab-dist && npm pack ..",
     "build:all": "npm run build && npm run build:lab",
+    "eslint": "eslint . --ext .ts,.tsx --fix",
+    "eslint:check": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint './src/**/*.{ts,tsx}' --fix",
     "clean": "rimraf lib",
     "watch": "tsc -w",
     "prepublishOnly": "npm run build"
@@ -54,12 +57,18 @@
     "requests-helper": "^0.1.5"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^2.21.0",
+    "@typescript-eslint/parser": "^2.21.0",
     "@babel/core": "^7.0.0",
     "@babel/preset-env": "^7.9.5",
     "isomorphic-fetch": "^2.2.1",
     "mkdirp": "^0.5.1",
+    "prettier": "^2.2.1",
     "rimraf": "^2.6.1",
-    "typescript": "^3.1.6"
+    "typescript": "^3.1.6",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.10.0",
+    "eslint-plugin-prettier": "^3.1.2"
   },
   "resolutions": {
     "node-notifier": "^8.0.1"

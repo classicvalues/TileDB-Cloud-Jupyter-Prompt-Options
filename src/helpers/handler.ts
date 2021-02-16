@@ -1,9 +1,5 @@
 import { URLExt } from '@jupyterlab/coreutils';
-
 import { ServerConnection } from '@jupyterlab/services';
-
-
-// const BASE_API_URI = 'https://api.tiledb.com/v1';
 
 /**
  * Call the API extension
@@ -21,7 +17,7 @@ export async function requestAPI<T>(
   const requestUrl = URLExt.join(
     settings.baseUrl,
     'get_access_token',
-    endPoint = ''
+    (endPoint = '')
   );
 
   let response: Response;

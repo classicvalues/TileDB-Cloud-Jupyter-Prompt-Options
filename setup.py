@@ -43,7 +43,6 @@ cmdclass["js"] = combine_commands(
     ),
 )
 
-
 setup(
     name=name,
     use_scm_version={

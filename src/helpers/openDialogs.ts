@@ -1,25 +1,25 @@
-import { showDialog } from "@jupyterlab/apputils";
-import { Dialog } from "@jupyterlab/apputils";
+import { showDialog } from '@jupyterlab/apputils';
+import { Dialog } from '@jupyterlab/apputils';
 import {
   CredentialsDialog,
   CredentialsDialogValue,
-} from "../dialogs/CredentialsDialog";
+} from '../dialogs/CredentialsDialog';
 import {
   Options,
   PromptDialogValue,
   TileDBPromptOptionsWidget,
-} from "../dialogs/TileDBPromptOptionsWidget";
-import getTileDBAPI from "../tiledbAPI";
+} from '../dialogs/TileDBPromptOptionsWidget';
+import getTileDBAPI from './tiledbAPI';
 
-export const showMainDialog = (data: Options) => {
+export const showMainDialog = (data: Options): void => {
   showDialog<PromptDialogValue>({
     body: new TileDBPromptOptionsWidget(data),
-    buttons: [Dialog.cancelButton(), Dialog.okButton({ label: "GO" })],
-    title: "TileDB Notebook Options",
+    buttons: [Dialog.cancelButton(), Dialog.okButton({ label: 'GO' })],
+    title: 'TileDB Notebook Options',
   }).then((result) => {
-    if (result.button.label === "Cancel") {
+    if (result.button.label === 'Cancel') {
       return;
-    } else if (result.button.label === "GO") {
+    } else if (result.button.label === 'GO') {
       const { name, owner, s3_credentials, s3_prefix } = result.value;
       const tiledb_options_json = {
         name,
@@ -28,17 +28,17 @@ export const showMainDialog = (data: Options) => {
       };
 
       return new Promise(() => {
-        const path = "cloud/owned/".concat(owner, "/");
+        const path = 'cloud/owned/'.concat(owner, '/');
         data.app.commands
-          .execute("docmanager:new-untitled", {
+          .execute('docmanager:new-untitled', {
             path: path,
-            type: "notebook",
+            type: 'notebook',
             options: JSON.stringify(tiledb_options_json),
           })
           .then((model: any) => {
-            data.app.commands.execute("docmanager:open", {
-              factory: "Notebook",
-              path: model.path + ".ipynb",
+            data.app.commands.execute('docmanager:open', {
+              factory: 'Notebook',
+              path: model.path + '.ipynb',
             });
           });
       });
@@ -46,16 +46,19 @@ export const showMainDialog = (data: Options) => {
   });
 };
 
-export function openCredentialsDialog(username: string, options: Options) {
+export function openCredentialsDialog(
+  username: string,
+  options: Options
+): void {
   showDialog<CredentialsDialogValue>({
     body: new CredentialsDialog(),
-    buttons: [Dialog.cancelButton(), Dialog.okButton({ label: "Add" })],
-    title: "Add AWS credentials",
+    buttons: [Dialog.cancelButton(), Dialog.okButton({ label: 'Add' })],
+    title: 'Add AWS credentials',
   }).then(async (result) => {
-    if (result.button.label === "Cancel") {
+    if (result.button.label === 'Cancel') {
       return;
-    } else if (result.button.label === "Add") {
-      var { credentialName, credentialKey, credentialSecret } = result.value;
+    } else if (result.button.label === 'Add') {
+      const { credentialName, credentialKey, credentialSecret } = result.value;
       const tileDBAPI = await getTileDBAPI();
 
       await tileDBAPI.addAWSAccessCredentials(username, {

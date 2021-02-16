@@ -1,4 +1,4 @@
-import { Widget } from "@lumino/widgets";
+import { Widget } from '@lumino/widgets';
 
 export interface CredentialsDialogValue {
   credentialName: string;
@@ -8,43 +8,47 @@ export interface CredentialsDialogValue {
 
 export class CredentialsDialog extends Widget {
   public constructor() {
-    const body = document.createElement("div");
+    const body = document.createElement('div');
 
-    const name_label = document.createElement("label");
-    name_label.textContent = "Name:";
-    const name_input = document.createElement("input");
-    name_input.setAttribute("type", "text");
-    name_input.setAttribute("value", "");
+    const nameLabel = document.createElement('label');
+    nameLabel.textContent = 'Name:';
+    const nameInput = document.createElement('input');
+    nameInput.setAttribute('type', 'text');
+    nameInput.setAttribute('value', '');
 
-    const key_label = document.createElement("label");
-    key_label.textContent = "AWS access key id:";
-    const key_input = document.createElement("input");
-    key_input.setAttribute("type", "text");
-    key_input.setAttribute("value", "");
+    const keyLabel = document.createElement('label');
+    keyLabel.textContent = 'AWS access key id:';
+    const keyInput = document.createElement('input');
+    keyInput.setAttribute('type', 'text');
+    keyInput.setAttribute('value', '');
 
-    const secret_label = document.createElement("label");
-    secret_label.textContent = "AWS secret access key:";
-    const secret_input = document.createElement("input");
-    secret_input.setAttribute("type", "text");
-    secret_input.setAttribute("value", "");
+    const secretLabel = document.createElement('label');
+    secretLabel.textContent = 'AWS secret access key:';
+    const secretInput = document.createElement('input');
+    secretInput.setAttribute('type', 'text');
+    secretInput.setAttribute('value', '');
 
-    body.appendChild(name_label);
-    body.appendChild(name_input);
-    body.appendChild(key_label);
-    body.appendChild(key_input);
-    body.appendChild(secret_label);
-    body.appendChild(secret_input);
+    body.appendChild(nameLabel);
+    body.appendChild(nameInput);
+    body.appendChild(keyLabel);
+    body.appendChild(keyInput);
+    body.appendChild(secretLabel);
+    body.appendChild(secretInput);
 
     super({ node: body });
   }
 
   public getValue(): CredentialsDialogValue {
-    let input_elem = this.node.getElementsByTagName("input");
+    const [
+      credentialNameInput,
+      credentialKeyInput,
+      credentialSecretInput,
+    ] = this.node.getElementsByTagName('input');
 
     return {
-      credentialName: input_elem[0].value,
-      credentialKey: input_elem[1].value,
-      credentialSecret: input_elem[2].value,
+      credentialName: credentialNameInput.value,
+      credentialKey: credentialKeyInput.value,
+      credentialSecret: credentialSecretInput.value,
     };
   }
 }

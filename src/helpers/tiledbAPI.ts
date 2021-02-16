@@ -1,7 +1,7 @@
-import { UserApi } from "@tiledb-inc/tiledb-cloud";
-import { requestAPI } from "./handler";
+import { UserApi } from '@tiledb-inc/tiledb-cloud';
+import { requestAPI } from './handler';
 
-const getTileDBAPI = async () => {
+const getTileDBAPI = async (): Promise<UserApi> => {
   const data: any = await requestAPI();
   const config = {
     apiKey: data.token,
