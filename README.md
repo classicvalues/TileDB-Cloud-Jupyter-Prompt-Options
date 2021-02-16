@@ -13,7 +13,7 @@ You can install using `pip` and `jupyterlab`:
 
 ```bash
 pip install tiledb_prompt_options
-jupyter labextension install tiledb_prompt_options
+jupyter labextension install @tiledb/tiledb_prompt_options
 ```
 
 For development mode, in the top level directory run:

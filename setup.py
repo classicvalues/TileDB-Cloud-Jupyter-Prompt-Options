@@ -52,7 +52,7 @@ setup(
     },
     description="TileDB notebook extension to prompt user for notebook options",
     author="TileDB, Inc.",
-    license="BSD",
+    license="MIT",
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Programming Language :: Python :: 2",

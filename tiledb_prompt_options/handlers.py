@@ -13,7 +13,7 @@ class RouteHandler(APIHandler):
     # Jupyter server
     @tornado.web.authenticated
     def get(self):
-        TOKEN = os.getenv('TILEDB_TOKEN')
+        TOKEN = os.getenv('TILEDB_REST_TOKEN')
         self.finish(json.dumps({"token": TOKEN}))
 
 
