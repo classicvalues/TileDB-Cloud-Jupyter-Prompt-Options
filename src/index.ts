@@ -72,7 +72,7 @@ function activate(
   }
 
   console.log(
-    'JupyterLab extension @tiledb/tiledb_prompt_options is activated!'
+    'JupyterLab extension @tiledb/tiledb_prompt_options is activated.'
   );
 }
 
