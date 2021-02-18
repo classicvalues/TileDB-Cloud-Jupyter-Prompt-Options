@@ -61,7 +61,7 @@ stages:
       displayName: 'Install yarn'
       condition: eq(variables['imageName'], 'ubuntu-16.04')
 
-    - script: python -m pip install --upgrade ipywidgets traitlets pytest wheel jupyter_packaging pep517
+    - script: python -m pip install --upgrade ipywidgets traitlets pytest wheel jupyter_packaging
       # pip installs release candidates by default:
       #   https://github.com/pypa/pip/issues/4969
       displayName: 'Install dependencies'
@@ -73,7 +73,7 @@ stages:
       displayName: 'Test Formating'
       condition: eq(variables['python.version'], '3.7')
 
-    - script: python -m pip install --upgrade .
+    - script: python -m pip install --no-use-pep517 --upgrade .
       displayName: 'Test Install'
       condition: ne(variables['Agent.OS'], 'Windows_NT')
       env:
