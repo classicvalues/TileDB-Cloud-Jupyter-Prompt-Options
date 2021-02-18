@@ -106,7 +106,7 @@ jobs:
       versionSpec: '3.7'
       architecture: 'x64'
 
-  - script: 'pip install twine wheel setuptools setuptools_scm'
+  - script: 'pip install twine wheel setuptools setuptools_scm jupyter_packaging'
     displayName: 'Install twine/wheel'
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags'))
 

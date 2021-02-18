@@ -7,15 +7,15 @@ from notebook.utils import url_path_join
 import tornado
 from tornado.web import StaticFileHandler
 
+
 class RouteHandler(APIHandler):
     # The following decorator should be present on all verb methods (head, get, post,
     # patch, put, delete, options) to ensure only authorized user can request the
     # Jupyter server
     @tornado.web.authenticated
     def get(self):
-        TOKEN = os.getenv('TILEDB_REST_TOKEN')
+        TOKEN = os.getenv("TILEDB_REST_TOKEN")
         self.finish(json.dumps({"token": TOKEN}))
-
 
 
 def setup_handlers(web_app, url_path):
