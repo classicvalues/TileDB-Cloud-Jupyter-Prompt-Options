@@ -61,7 +61,7 @@ stages:
       displayName: 'Install yarn'
       condition: eq(variables['imageName'], 'ubuntu-16.04')
 
-    - script: python -m pip install --upgrade ipywidgets traitlets pytest wheel jupyter_packaging
+    - script: python -m pip install --upgrade ipywidgets traitlets pytest wheel jupyter_packaging pep517
       # pip installs release candidates by default:
       #   https://github.com/pypa/pip/issues/4969
       displayName: 'Install dependencies'
