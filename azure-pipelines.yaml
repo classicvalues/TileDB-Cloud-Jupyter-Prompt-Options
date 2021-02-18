@@ -40,8 +40,6 @@ stages:
         brew upgrade
         brew cleanup
         brew install yarn
-        brew install rbenv/tap/openssl@1.0
-        brew switch openssl 1.0.2t
       displayName: 'Install NodeJS and yarn'
       condition: eq(variables['imageName'], 'macOS-10.14')
 
