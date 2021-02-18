@@ -73,7 +73,7 @@ stages:
       displayName: 'Test Formating'
       condition: eq(variables['python.version'], '3.7')
 
-    - script: python -m pip install --no-use-pep517 --upgrade .
+    - script: python -m pip install --upgrade .
       displayName: 'Test Install'
       condition: ne(variables['Agent.OS'], 'Windows_NT')
       env:
