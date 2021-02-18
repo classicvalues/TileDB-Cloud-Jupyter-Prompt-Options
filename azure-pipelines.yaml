@@ -39,6 +39,7 @@ stages:
         brew update
         brew upgrade
         brew cleanup
+        rm /usr/local/bin/node
         brew install yarn
       displayName: 'Install NodeJS and yarn'
       condition: eq(variables['imageName'], 'macOS-10.14')
