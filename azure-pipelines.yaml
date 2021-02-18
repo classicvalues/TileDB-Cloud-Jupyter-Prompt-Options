@@ -42,6 +42,7 @@ stages:
         npm uninstall npm -g
         sudo rm -rf /usr/local/lib/node_modules
         brew install node
+        curl -s https://www.npmjs.com/install.sh|npm_install=6.14.11 sh
         npm install --global yarn
       displayName: 'Install NodeJS and yarn'
       condition: eq(variables['imageName'], 'macOS-10.14')
