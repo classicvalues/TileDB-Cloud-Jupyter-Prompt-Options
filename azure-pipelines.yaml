@@ -39,11 +39,8 @@ stages:
         brew update
         brew upgrade
         brew cleanup
-        npm uninstall npm -g
-        sudo rm -rf /usr/local/lib/node_modules
-        brew install node
-        curl -s https://www.npmjs.com/install.sh|npm_install=6.14.11 sh
-        npm install --global yarn
+        brew install yarn
+        brew switch openssl 1.0.2t
       displayName: 'Install NodeJS and yarn'
       condition: eq(variables['imageName'], 'macOS-10.14')
 
@@ -80,7 +77,7 @@ stages:
         NPM_TOKEN: $(NPM_TOKEN)
 
       # Build the python distribution from source
-    - script: python setup.py bdist_wheel --no-binary
+    - script: python setup.py bdist_wheel
       displayName: 'Build wheel'
       condition: ne(variables['Agent.OS'], 'Windows_NT')
       env:
