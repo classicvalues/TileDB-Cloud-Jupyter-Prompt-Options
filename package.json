@@ -15,7 +15,6 @@
     "jupyterlab",
     "jupyterlab-extension"
   ],
-  "private": true,
   "scripts": {
     "build": "tsc",
     "build:lab": "rimraf lab-dist && mkdirp lab-dist && cd lab-dist && npm pack ..",
