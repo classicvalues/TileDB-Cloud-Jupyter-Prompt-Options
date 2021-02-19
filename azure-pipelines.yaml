@@ -80,7 +80,7 @@ stages:
         NPM_TOKEN: $(NPM_TOKEN)
 
       # Build the python distribution from source
-    - script: python setup.py bdist_wheel
+    - script: python setup.py bdist_wheel --no-binary
       displayName: 'Build wheel'
       condition: ne(variables['Agent.OS'], 'Windows_NT')
       env:
