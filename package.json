@@ -1,5 +1,5 @@
 {
-  "name": "@tiledb/tiledb_prompt_options",
+  "name": "@tiledb-inc/tiledb_prompt_options",
   "version": "0.1.0",
   "description": "TileDB notebook extension to prompt user for notebook options",
   "author": "TileDB, Inc.",
