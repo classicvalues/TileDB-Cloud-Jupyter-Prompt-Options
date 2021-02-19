@@ -13,10 +13,10 @@ stages:
     strategy:
       matrix:
         mac_36:
-          imageName: 'macOS-10.14'
+          imageName: 'macOS-10.15'
           python.version: '3.6'
         mac_37:
-          imageName: 'macOS-10.14'
+          imageName: 'macOS-10.15'
           python.version: '3.7'
         linux_py36:
           imageName: 'ubuntu-16.04'
@@ -34,15 +34,10 @@ stages:
         architecture: 'x64'
 
     - script: |
-        brew uninstall node
-        brew unlink node@6
-        brew update
-        brew upgrade
-        brew cleanup
-        brew install yarn
-        brew switch openssl 1.0.2t
+        echo $(node -v)
+        npm install --global yarn
       displayName: 'Install NodeJS and yarn'
-      condition: eq(variables['imageName'], 'macOS-10.14')
+      condition: eq(variables['imageName'], 'macOS-10.15')
 
     - script: |
         sudo apt-get install curl
