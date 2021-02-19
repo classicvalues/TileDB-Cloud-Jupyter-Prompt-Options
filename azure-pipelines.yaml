@@ -93,6 +93,7 @@ stages:
       displayName: "Print log files (failed build only)"
 - stage: Deploy
   dependsOn: Build
+  condition: and(succeeded('Build'), startsWith(variables['Build.SourceBranch'], 'refs/tags'))
   jobs:
   - job: Deploy_pip_package
     pool:
@@ -106,12 +107,10 @@ stages:
 
     - script: 'pip install twine wheel setuptools setuptools_scm jupyter_packaging'
       displayName: 'Install twine/wheel'
-      condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags'))
 
       # Build the python distribution from source
     - script: python setup.py bdist_wheel
       displayName: 'Build wheel'
-      condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags'))
       env:
         NPM_TOKEN: $(NPM_TOKEN)
 
@@ -122,7 +121,6 @@ stages:
 
     - script: python -m twine upload -r "pypi-upload" --config-file $(PYPIRC_PATH) dist/*.whl
       displayName: 'Upload to Pypi'
-      condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags'))
 
   - job: Deploy_npm_package
     pool:
@@ -142,7 +140,6 @@ stages:
     - script: |
         yarn build
       displayName: 'Build'
-      condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags'))
       env:
         NPM_TOKEN: $(NPM_TOKEN)
 
@@ -153,4 +150,3 @@ stages:
         GITHUB_TOKEN: $(GITHUB_TOKEN)
         NPM_TOKEN: $(NPM_TOKEN)
       displayName: 'Release'
-      condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags'))
