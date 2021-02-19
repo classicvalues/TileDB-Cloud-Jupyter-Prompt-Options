@@ -93,7 +93,7 @@ stages:
       displayName: "Print log files (failed build only)"
 - stage: Deploy
   dependsOn: Build
-  condition: and(succeeded('Build'), startsWith(variables['Build.SourceBranch'], 'refs/pull'))
+  condition: and(succeeded('Build'), startsWith(variables['Build.SourceBranch'], 'refs/tag'))
   jobs:
   - job: Deploy_pip_package
     pool:
