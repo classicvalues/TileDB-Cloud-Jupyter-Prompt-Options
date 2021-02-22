@@ -5,6 +5,7 @@ const getTileDBAPI = async (): Promise<UserApi> => {
   const data: any = await requestAPI();
   const config = {
     apiKey: data.token,
+    basePath: data.api_host,
   };
   return new UserApi(config);
 };

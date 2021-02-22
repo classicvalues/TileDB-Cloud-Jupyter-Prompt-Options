@@ -15,7 +15,8 @@ class RouteHandler(APIHandler):
     @tornado.web.authenticated
     def get(self):
         TOKEN = os.getenv("TILEDB_REST_TOKEN")
-        self.finish(json.dumps({"token": TOKEN}))
+        API_HOST = os.getenv("TILEDB_REST_HOST")
+        self.finish(json.dumps({"token": TOKEN, "api_host": API_HOST}))
 
 
 def setup_handlers(web_app, url_path):
