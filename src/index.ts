@@ -49,6 +49,8 @@ function activate(
         owners,
         credentials: credentialsResponse.data || [],
         defaultS3Path,
+        defaultS3CredentialName:
+          (userData as any).default_s3_path_credentials_name || '',
         app,
       });
     },

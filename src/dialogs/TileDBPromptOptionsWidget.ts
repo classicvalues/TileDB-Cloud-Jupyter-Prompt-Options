@@ -6,6 +6,7 @@ export interface Options {
   owners: string[];
   credentials: any[];
   defaultS3Path: string;
+  defaultS3CredentialName: string;
   app: JupyterFrontEnd;
 }
 
@@ -43,6 +44,9 @@ export class TileDBPromptOptionsWidget extends Widget {
       const option = document.createElement('option');
       option.setAttribute('value', cred.name);
       option.setAttribute('label', cred.name);
+      if (options.defaultS3CredentialName === cred.name) {
+        option.setAttribute('selected', 'true');
+      }
       s3_cred_input.append(option);
     });
 
