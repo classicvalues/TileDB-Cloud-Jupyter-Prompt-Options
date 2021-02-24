@@ -1,5 +1,5 @@
 from tornado import gen, web
-
+from .handlers import setup_handlers
 from notebook.services.contents.handlers import ContentsHandler, validate_model
 from notebook.utils import maybe_future, url_path_join
 
@@ -75,6 +75,9 @@ def load_jupyter_server_extension(nb_server_app):
     route_patterns = []
 
     route_patterns.append(tiledb_cloud_base.format(profile.username))
+
+    token_url_path = "get_access_token"
+    setup_handlers(web_app, token_url_path)
 
     for organization in profile.organizations:
         route_patterns.append(tiledb_cloud_base.format(organization.organization_name))
