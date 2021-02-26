@@ -60,4 +60,3 @@ class TileDBHandler(ContentsHandler):
         self.set_status(201)
         validate_model(model, expect_content=False)
         self._finish_model(model)
-

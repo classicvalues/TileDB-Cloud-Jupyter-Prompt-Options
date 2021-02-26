@@ -10,14 +10,13 @@ def _jupyter_server_extension_paths():
     return [{"module": "tiledb_prompt_options"}]
 
 
-
 def load_jupyter_server_extension(nb_server_app):
     """
     Called when the extension is loaded.
     """
     web_app = nb_server_app.web_app
     host_pattern = ".*$"
-    
+
     profile = tiledb.cloud.client.user_profile()
     tiledb_cloud_base = "/api/contents/cloud/owned/{}"
     route_patterns = []
@@ -33,4 +32,6 @@ def load_jupyter_server_extension(nb_server_app):
         rp = url_path_join(web_app.settings["base_url"], url)
         web_app.add_handlers(host_pattern, [(rp, TileDBHandler)])
 
-    nb_server_app.log.info("Added content handlers for current user: {}".format(str(route_patterns)))
+    nb_server_app.log.info(
+        "Added content handlers for current user: {}".format(str(route_patterns))
+    )
