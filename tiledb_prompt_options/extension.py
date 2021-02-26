@@ -22,7 +22,6 @@ class TileDBHandler(ContentsHandler):
         new_untitled() function in TileDBContentsManager.
         """
         cm = self.contents_manager
-
         file_exists = yield maybe_future(cm.file_exists(path))
         if file_exists:
             raise web.HTTPError(400, "Cannot POST to files, use PUT instead.")
@@ -62,26 +61,3 @@ class TileDBHandler(ContentsHandler):
         validate_model(model, expect_content=False)
         self._finish_model(model)
 
-
-def load_jupyter_server_extension(nb_server_app):
-    """
-    Called when the extension is loaded.
-    """
-    web_app = nb_server_app.web_app
-    host_pattern = ".*$"
-
-    profile = tiledb.cloud.client.user_profile()
-    tiledb_cloud_base = "/api/contents/cloud/owned/{}/"
-    route_patterns = []
-
-    route_patterns.append(tiledb_cloud_base.format(profile.username))
-
-    token_url_path = "get_access_token"
-    setup_handlers(web_app, token_url_path)
-
-    for organization in profile.organizations:
-        route_patterns.append(tiledb_cloud_base.format(organization.organization_name))
-
-    for url in route_patterns:
-        rp = url_path_join(web_app.settings["base_url"], url)
-        web_app.add_handlers(host_pattern, [(rp, TileDBHandler)])
