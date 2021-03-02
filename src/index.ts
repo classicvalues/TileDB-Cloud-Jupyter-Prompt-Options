@@ -64,6 +64,8 @@ function activate(
       args: { isLauncher: true, kernelName: 'tiledb-prompt-notebook-options' },
       category: 'Notebook',
       command: OPEN_COMMAND,
+      kernelIconUrl:
+        'https://cloud.tiledb.com/static/img/tiledb-logo-jupyterlab.svg',
       rank: 1,
     });
   }
