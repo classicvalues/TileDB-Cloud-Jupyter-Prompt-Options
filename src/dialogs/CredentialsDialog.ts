@@ -10,6 +10,10 @@ export class CredentialsDialog extends Widget {
   public constructor() {
     const body = document.createElement('div');
 
+    super({ node: body });
+
+    this.addClass('TDB-Credentials-Dialog');
+
     const nameLabel = document.createElement('label');
     nameLabel.textContent = 'Name:';
     const nameInput = document.createElement('input');
@@ -34,8 +38,6 @@ export class CredentialsDialog extends Widget {
     body.appendChild(keyInput);
     body.appendChild(secretLabel);
     body.appendChild(secretInput);
-
-    super({ node: body });
   }
 
   public getValue(): CredentialsDialogValue {

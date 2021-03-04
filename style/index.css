@@ -1,0 +1,10 @@
+.TDB-Credentials-Dialog label,
+.TDB-Prompt-Dialog label {
+    margin: 8px 0 4px;
+}
+
+.TDB-Prompt-Dialog__link {
+    color: #106ba3;
+    text-decoration: underline;
+    margin-top: -8px;
+}

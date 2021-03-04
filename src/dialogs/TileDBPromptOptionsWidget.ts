@@ -23,6 +23,8 @@ export class TileDBPromptOptionsWidget extends Widget {
 
     super({ node: body });
 
+    this.addClass('TDB-Prompt-Dialog');
+
     const name_label = document.createElement('label');
     name_label.textContent = 'Name:';
     const name_input = document.createElement('input');
@@ -52,8 +54,8 @@ export class TileDBPromptOptionsWidget extends Widget {
 
     const addCredentialsLink = document.createElement('a');
     addCredentialsLink.textContent = 'Add credentials';
-    addCredentialsLink.style.color = '#106ba3';
-    addCredentialsLink.style.textDecoration = 'underline';
+    addCredentialsLink.classList.add('TDB-Prompt-Dialog__link');
+
     addCredentialsLink.onclick = (): void => {
       const username = options.owners[0];
       openCredentialsDialog(username, options);
