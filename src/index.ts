@@ -1,150 +1,86 @@
 import {
-  JupyterFrontEnd, JupyterFrontEndPlugin,
-} from "@jupyterlab/application";
-
-import {
-  Dialog, showDialog,
-} from "@jupyterlab/apputils";
-
-import {
-  IFileBrowserFactory,
-} from "@jupyterlab/filebrowser";
-
-import {
-  ILauncher,
-} from "@jupyterlab/launcher";
-
-import {
-  IMainMenu,
-} from "@jupyterlab/mainmenu";
-
-import {
-  Widget,
-} from "@lumino/widgets";
+  JupyterFrontEnd,
+  JupyterFrontEndPlugin,
+} from '@jupyterlab/application';
+import { IDocumentManager } from '@jupyterlab/docmanager';
+import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
+import { ILauncher } from '@jupyterlab/launcher';
+import { IMainMenu } from '@jupyterlab/mainmenu';
+import getTileDBAPI from './helpers/tiledbAPI';
+import { showMainDialog } from './helpers/openDialogs';
+import getOrgNamesWithWritePermissions from './helpers/getOrgNamesWithWritePermissions';
 
 const extension: JupyterFrontEndPlugin<void> = {
   activate,
   autoStart: true,
-  id: "tiledb-prompt-notebook-options",
+  id: 'tiledb-prompt-notebook-options',
   optional: [ILauncher],
-  requires: [IMainMenu, IFileBrowserFactory],
+  requires: [IMainMenu, IDocumentManager, IFileBrowserFactory],
 };
 
-export
-class TileDBPromptOptionsWidget extends Widget {
-  public constructor() {
-    const body = document.createElement("div");
+function activate(
+  app: JupyterFrontEnd,
+  menu: IMainMenu,
+  docManager: IDocumentManager,
+  browser: IFileBrowserFactory,
+  launcher: ILauncher | null
+): void {
+  const OPEN_COMMAND = 'tiledb-prompt-notebook-options:open';
 
-    const name_label = document.createElement("label");
-    name_label.textContent = "Name:";
-    const name_input = document.createElement("input");
-    name_input.setAttribute("type", "text");
-    name_input.setAttribute("value", "Untitled");
+  app.commands.addCommand(OPEN_COMMAND, {
+    caption: 'Prompt the user for TileDB notebook options',
+    execute: async () => {
+      const tileDBAPI = await getTileDBAPI();
 
-    const s3_label = document.createElement("label");
-    s3_label.textContent = "S3 Path:";
-    const s3_input = document.createElement("input");
-    s3_input.setAttribute("type", "text");
-    s3_input.setAttribute("value", "s3://tiledb-user/notebooks");
+      const userResponse = await tileDBAPI.getUser();
+      const userData = userResponse.data;
+      const username = userData.username;
+      const credentialsResponse = await tileDBAPI.checkAWSAccessCredentials(
+        username
+      );
+      const owners = [username];
+      const organizationsWithWritePermissions = getOrgNamesWithWritePermissions(
+        userData.organizations || []
+      );
+      const defaultS3Path =
+        (userData as any).default_s3_path || 's3://tiledb-user/notebooks';
 
-    const s3_cred_label = document.createElement("label");
-    s3_cred_label.textContent = "S3 Path Credentials:";
-    // const s3_cred_input = document.createElement("select");
-    const s3_cred_input = document.createElement("input");
-    s3_cred_input.setAttribute("type", "text");
-    s3_cred_input.setAttribute("value", "tiledb-user-creds");
-    
-    const owner_label = document.createElement("label");
-    owner_label.textContent = "Owner:";
-    // const owner_input = document.createElement("select");
-    const owner_input = document.createElement("input");
-    owner_input.setAttribute("type", "text");
-    owner_input.setAttribute("value", "user");
+      owners.push(...organizationsWithWritePermissions);
 
-    body.appendChild(name_label);
-    body.appendChild(name_input);
-    body.appendChild(s3_label);
-    body.appendChild(s3_input);
-    body.appendChild(s3_cred_label);
-    body.appendChild(s3_cred_input);
-    body.appendChild(owner_label);
-    body.appendChild(owner_input);
-
-    super({ node: body });
-  }
-
-  public getValue(): string {
-    let input_elem = this.node.getElementsByTagName("input");
-    return [input_elem[0].value, input_elem[1].value, 
-            input_elem[2].value, input_elem[3].value].join(" ");
-  }
-}
-
-function activate(app: JupyterFrontEnd,
-                  menu: IMainMenu,
-                  browser: IFileBrowserFactory,
-                  launcher: ILauncher | null) {
-  const open_command = "tiledb-prompt-notebook-options:open";
-
-  app.commands.addCommand(open_command, {
-    caption: "Prompt the user for TileDB notebook options",
-    execute: (args) => {
-      showDialog({
-        body: new TileDBPromptOptionsWidget(),
-        buttons: [Dialog.cancelButton(), Dialog.okButton({ label: "GO" })],
-        title: "TileDB Notebook Options",
-      }).then((result) => {
-        var results = result.value.split(" ");
-        if (result.button.label === "Cancel") {
-          return;
-        } else if (result.button.label === "GO"){
-          var tiledb_options_json = 
-          {
-            name: results[0],
-            s3_prefix: results[1],
-            s3_credentials: results[2]
-          };
-          
-          return new Promise(() => {
-            var path = "cloud/owned/".concat(results[3], "/")
-            app.commands.execute(
-              "docmanager:new-untitled", { 
-              path: path,
-              type: "notebook",
-              options: JSON.stringify(tiledb_options_json)
-            }).then((model) => {
-                app.commands.execute(
-                  "docmanager:open", {
-                  factory: "Notebook", 
-                  path: model.path + ".ipynb",
-                });
-              })
-          })
-        }
-      })
+      showMainDialog({
+        owners,
+        credentials: credentialsResponse.data || [],
+        defaultS3Path,
+        defaultS3CredentialName:
+          (userData as any).default_s3_path_credentials_name || '',
+        app,
+        docManager,
+      });
     },
     isEnabled: () => true,
-    label: "TileDB Notebook",
+    label: 'TileDB Notebook',
   });
 
   // Add a launcher item.
   if (launcher) {
     launcher.add({
-      args: { isLauncher: true, kernelName: "tiledb-prompt-notebook-options" },
-      category: "Notebook",
-      command: open_command,
-      // eslint-disable-next-line max-len
+      args: { isLauncher: true, kernelName: 'tiledb-prompt-notebook-options' },
+      category: 'Notebook',
+      command: OPEN_COMMAND,
+      kernelIconUrl:
+        'https://cloud.tiledb.com/static/img/tiledb-logo-jupyterlab.svg',
       rank: 1,
     });
   }
 
   // Add to the file menu.
   if (menu) {
-    menu.fileMenu.newMenu.addGroup([{ command: open_command }], 40);
+    menu.fileMenu.newMenu.addGroup([{ command: OPEN_COMMAND }], 40);
   }
 
-  console.log("JupyterLab extension tiledb-prompt-notebook-options is activated!");
+  console.log(
+    'JupyterLab extension @tiledb/tiledb_prompt_options is activated.'
+  );
 }
 
 export default extension;
-export {activate as _activate};

@@ -38,11 +38,8 @@ data_spec = [
 cmdclass = create_cmdclass("js", data_files_spec=data_spec)
 cmdclass["js"] = combine_commands(
     install_npm(here, build_cmd="build:all"),
-    ensure_targets(
-        [pjoin(here, "lib", "index.js")]
-    ),
+    ensure_targets([pjoin(here, "lib", "index.js")]),
 )
-
 
 setup(
     name=name,
@@ -53,7 +50,7 @@ setup(
     },
     description="TileDB notebook extension to prompt user for notebook options",
     author="TileDB, Inc.",
-    license="BSD",
+    license="MIT",
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Programming Language :: Python :: 2",
