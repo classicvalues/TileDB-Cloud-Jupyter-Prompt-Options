@@ -14,35 +14,11 @@ import getTileDBAPI from './tiledbAPI';
 export const showMainDialog = (data: Options): void => {
   showDialog<PromptDialogValue>({
     body: new TileDBPromptOptionsWidget(data),
-    buttons: [Dialog.cancelButton(), Dialog.okButton({ label: 'GO' })],
+    buttons: [
+      Dialog.cancelButton(),
+      Dialog.okButton({ label: 'GO', className: 'TDB-Prompt-Dialog__btn' }),
+    ],
     title: 'TileDB Notebook Options',
-  }).then((result) => {
-    if (result.button.label === 'Cancel') {
-      return;
-    } else if (result.button.label === 'GO') {
-      const { name, owner, s3_credentials, s3_prefix } = result.value;
-      const tiledb_options_json = {
-        name,
-        s3_prefix,
-        s3_credentials,
-      };
-
-      return new Promise(() => {
-        const path = 'cloud/owned/'.concat(owner, '/');
-        data.app.commands
-          .execute('docmanager:new-untitled', {
-            path: path,
-            type: 'notebook',
-            options: JSON.stringify(tiledb_options_json),
-          })
-          .then((model: any) => {
-            data.app.commands.execute('docmanager:open', {
-              factory: 'Notebook',
-              path: model.path + '.ipynb',
-            });
-          });
-      });
-    }
   });
 };
 

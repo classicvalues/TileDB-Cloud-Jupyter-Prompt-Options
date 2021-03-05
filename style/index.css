@@ -3,8 +3,83 @@
     margin: 8px 0 4px;
 }
 
+.TDB-Prompt-Dialog__form {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+}
+
 .TDB-Prompt-Dialog__link {
     color: #106ba3;
     text-decoration: underline;
     margin-top: -8px;
+}
+
+.TDB-Prompt-Dialog__btn {
+    display: none;
+}
+
+.TDB-Prompt-Dialog__styled-btn {
+    min-width: 40px;
+    text-align: center;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+}
+
+.TDB-Prompt-Dialog__loader,
+.TDB-Prompt-Dialog__loader:before,
+.TDB-Prompt-Dialog__loader:after {
+  border-radius: 50%;
+  width: 2.5em;
+  height: 2.5em;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+  -webkit-animation: TDBLoaderPromptAnimation 1.4s infinite ease-in-out;
+  animation: TDBLoaderPromptAnimation 1.4s infinite ease-in-out;
+}
+.TDB-Prompt-Dialog__loader {
+  color: #ffffff;
+  font-size: 2px;
+  position: relative;
+  text-indent: -9999em;
+  -webkit-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-animation-delay: -0.16s;
+  animation-delay: -0.16s;
+}
+.TDB-Prompt-Dialog__loader:before,
+.TDB-Prompt-Dialog__loader:after {
+  content: '';
+  position: absolute;
+  top: 0;
+}
+.TDB-Prompt-Dialog__loader:before {
+  left: -3.5em;
+  -webkit-animation-delay: -0.32s;
+  animation-delay: -0.32s;
+}
+.TDB-Prompt-Dialog__loader:after {
+  left: 3.5em;
+}
+@-webkit-keyframes TDBLoaderPromptAnimation {
+  0%,
+  80%,
+  100% {
+    box-shadow: 0 2.5em 0 -1.3em;
+  }
+  40% {
+    box-shadow: 0 2.5em 0 0;
+  }
+}
+@keyframes TDBLoaderPromptAnimation {
+  0%,
+  80%,
+  100% {
+    box-shadow: 0 2.5em 0 -1.3em;
+  }
+  40% {
+    box-shadow: 0 2.5em 0 0;
+  }
 }

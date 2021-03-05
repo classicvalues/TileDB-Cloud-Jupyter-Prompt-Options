@@ -1275,7 +1275,7 @@
     "@lumino/signaling" "^1.3.5"
     "@lumino/widgets" "^1.11.1"
 
-"@jupyterlab/apputils@^2.2.6":
+"@jupyterlab/apputils@^2.2.6", "@jupyterlab/apputils@~2.2.6":
   version "2.2.6"
   resolved "https://registry.npmjs.org/@jupyterlab/apputils/-/apputils-2.2.6.tgz"
   integrity sha512-aWg0c6edfQC6b1sLFskirG+LqH1aGKnVGj7R7HR1loyOLVVq/HpZ9wkPZLCh8Gi1Wy4Tqvm2R46glmuu84W8xA==
@@ -1388,9 +1388,9 @@
     path-posix "~1.0.0"
     url-parse "~1.4.7"
 
-"@jupyterlab/docmanager@^2.2.4":
+"@jupyterlab/docmanager@^2.0.0", "@jupyterlab/docmanager@^2.2.4":
   version "2.2.4"
-  resolved "https://registry.npmjs.org/@jupyterlab/docmanager/-/docmanager-2.2.4.tgz"
+  resolved "https://registry.yarnpkg.com/@jupyterlab/docmanager/-/docmanager-2.2.4.tgz#46cabb9a914a303992a750caf3ba7bef8264388b"
   integrity sha512-60xRy552l2g7qRpJ+qwVlT/J1isJZikf3g5U2e8qaBwabtb+6UcNGkwIGYr5NSYY8CqDZhtgDVrU/VTI3aOH+w==
   dependencies:
     "@jupyterlab/apputils" "^2.2.6"

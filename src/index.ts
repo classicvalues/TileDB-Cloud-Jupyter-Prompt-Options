@@ -2,6 +2,7 @@ import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin,
 } from '@jupyterlab/application';
+import { IDocumentManager } from '@jupyterlab/docmanager';
 import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
 import { ILauncher } from '@jupyterlab/launcher';
 import { IMainMenu } from '@jupyterlab/mainmenu';
@@ -14,12 +15,13 @@ const extension: JupyterFrontEndPlugin<void> = {
   autoStart: true,
   id: 'tiledb-prompt-notebook-options',
   optional: [ILauncher],
-  requires: [IMainMenu, IFileBrowserFactory],
+  requires: [IMainMenu, IDocumentManager, IFileBrowserFactory],
 };
 
 function activate(
   app: JupyterFrontEnd,
   menu: IMainMenu,
+  docManager: IDocumentManager,
   browser: IFileBrowserFactory,
   launcher: ILauncher | null
 ): void {
@@ -52,6 +54,7 @@ function activate(
         defaultS3CredentialName:
           (userData as any).default_s3_path_credentials_name || '',
         app,
+        docManager,
       });
     },
     isEnabled: () => true,
