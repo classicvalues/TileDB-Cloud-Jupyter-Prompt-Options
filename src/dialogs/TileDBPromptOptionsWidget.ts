@@ -167,13 +167,17 @@ function onSbumit(app: JupyterFrontEnd, docManager: IDocumentManager): void {
   docManager.services.contents
     .newUntitled(options)
     .then((model) => {
-      app.commands.execute('docmanager:open', {
-        factory: 'Notebook',
-        path: model.path + '.ipynb',
-        kernel: 'python3',
-      });
-      // We click the original submit button to close the dialog
-      originalSubmitButton.click();
+      app.commands
+        .execute('docmanager:open', {
+          factory: 'Notebook',
+          path: model.path + '.ipynb',
+          kernel: 'python3',
+          kernelName: 'python3',
+        })
+        .finally(() => {
+          // We click the original submit button to close the dialog
+          originalSubmitButton.click();
+        });
     })
     .catch((err) => {
       showErrorMessage('Error', err);
