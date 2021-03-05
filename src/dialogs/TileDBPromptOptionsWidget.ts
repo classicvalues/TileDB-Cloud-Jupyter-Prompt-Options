@@ -115,7 +115,6 @@ export class TileDBPromptOptionsWidget extends Widget {
       'jp-mod-styled'
     );
     fakeBtn.textContent = 'GO';
-
     fakeBtn.onclick = (): void => onSbumit(this.app, this.docManager);
     footerElement.appendChild(fakeBtn);
   }
@@ -134,6 +133,7 @@ export class TileDBPromptOptionsWidget extends Widget {
 }
 
 function onSbumit(app: JupyterFrontEnd, docManager: IDocumentManager): void {
+  const kernel = { name: 'python3' };
   const fakeBtn = document.querySelector(
     '.TDB-Prompt-Dialog__styled-btn'
   ) as HTMLButtonElement;
@@ -171,8 +171,7 @@ function onSbumit(app: JupyterFrontEnd, docManager: IDocumentManager): void {
         .execute('docmanager:open', {
           factory: 'Notebook',
           path: model.path + '.ipynb',
-          kernel: 'python3',
-          kernelName: 'python3',
+          kernel,
         })
         .finally(() => {
           // We click the original submit button to close the dialog
