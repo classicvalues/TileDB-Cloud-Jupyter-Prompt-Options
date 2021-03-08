@@ -1,19 +1,26 @@
-import { UserApi } from '@tiledb-inc/tiledb-cloud';
 import { requestAPI } from './handler';
 
 const API_VERSION = 'v1';
 
 let data: any;
 
-const getTileDBAPI = async (): Promise<UserApi> => {
+interface Config {
+  apiKey: string;
+  basePath: string;
+}
+interface Constructable<T> {
+  new (c: Config): T;
+}
+
+const getTileDBAPI = async <T>(Api: Constructable<T>): Promise<T> => {
   if (!data) {
     data = await requestAPI();
   }
-  const config = {
+  const config: Config = {
     apiKey: data.token,
     basePath: `${data.api_host}/${API_VERSION}`,
   };
-  return new UserApi(config);
+  return new Api(config as any);
 };
 
 export default getTileDBAPI;

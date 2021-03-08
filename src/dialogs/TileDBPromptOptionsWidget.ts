@@ -1,3 +1,4 @@
+import { UserApi } from '@tiledb-inc/tiledb-cloud';
 import { addOptionsToSelectInput } from './../helpers/dom';
 import { JupyterFrontEnd } from '@jupyterlab/application';
 import { IDocumentManager } from '@jupyterlab/docmanager';
@@ -6,12 +7,13 @@ import { Widget } from '@lumino/widgets';
 import { openCredentialsDialog } from '../helpers/openDialogs';
 import { resetSelectInput } from '../helpers/dom';
 import getTileDBAPI from '../helpers/tiledbAPI';
+import getDefaultCredentialNameFromNamespace from '../helpers/getDefaultCredentialNameFromNamespace';
 
 export interface Options {
   owners: string[];
   credentials: any[];
   defaultS3Path: string;
-  defaultS3CredentialName: string;
+  defaultS3CredentialName?: string;
   app: JupyterFrontEnd;
   docManager: IDocumentManager;
   selectedOwner: string;
@@ -69,8 +71,7 @@ export class TileDBPromptOptionsWidget extends Widget {
     addCredentialsLink.classList.add('TDB-Prompt-Dialog__link');
 
     addCredentialsLink.onclick = (): void => {
-      const username = options.owners[0];
-      openCredentialsDialog(username, options);
+      openCredentialsDialog(options);
       const cancelButton: HTMLElement = document.body.querySelector(
         '.jp-Dialog-button.jp-mod-reject'
       );
@@ -89,16 +90,22 @@ export class TileDBPromptOptionsWidget extends Widget {
       const newOwner = (e.currentTarget as HTMLSelectElement).value;
       // Reset credentials input
       resetSelectInput(s3_cred_selectinput);
-      const tileDBAPI = await getTileDBAPI();
-      const credentialsResponse = await tileDBAPI.checkAWSAccessCredentials(
+      // Get credentials and default credentials name from API
+      const userTileDBAPI = await getTileDBAPI(UserApi);
+      const credentialsResponse = await userTileDBAPI.checkAWSAccessCredentials(
         newOwner
       );
       const newCredentials = credentialsResponse.data;
+      const username = options.owners[0];
+      const defaultCredentialsName = await getDefaultCredentialNameFromNamespace(
+        username,
+        newOwner
+      );
       const credentials: string[] = newCredentials.map((cred) => cred.name);
       addOptionsToSelectInput(
         s3_cred_selectinput,
         credentials,
-        options.defaultS3CredentialName
+        defaultCredentialsName
       );
     };
 
