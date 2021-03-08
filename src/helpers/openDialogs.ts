@@ -1,4 +1,4 @@
-import { showDialog } from '@jupyterlab/apputils';
+import { showDialog, showErrorMessage } from '@jupyterlab/apputils';
 import { Dialog } from '@jupyterlab/apputils';
 import {
   CredentialsDialog,
@@ -27,29 +27,38 @@ export function openCredentialsDialog(
   options: Options
 ): void {
   showDialog<CredentialsDialogValue>({
-    body: new CredentialsDialog(),
+    body: new CredentialsDialog(options.owners),
     buttons: [Dialog.cancelButton(), Dialog.okButton({ label: 'Add' })],
     title: 'Add AWS credentials',
   }).then(async (result) => {
     if (result.button.label === 'Cancel') {
       return;
     } else if (result.button.label === 'Add') {
-      const { credentialName, credentialKey, credentialSecret } = result.value;
+      const {
+        credentialName,
+        credentialKey,
+        credentialSecret,
+        owner,
+      } = result.value;
       const tileDBAPI = await getTileDBAPI();
+      try {
+        await tileDBAPI.addAWSAccessCredentials(owner, {
+          access_key_id: credentialKey,
+          name: credentialName,
+          secret_access_key: credentialSecret,
+        } as any);
+        const credentialsResponse = await tileDBAPI.checkAWSAccessCredentials(
+          owner
+        );
 
-      await tileDBAPI.addAWSAccessCredentials(username, {
-        access_key_id: credentialKey,
-        name: credentialName,
-        secret_access_key: credentialSecret,
-      } as any);
-      const credentialsResponse = await tileDBAPI.checkAWSAccessCredentials(
-        username
-      );
-
-      showMainDialog({
-        ...options,
-        credentials: credentialsResponse.data || [],
-      });
+        showMainDialog({
+          ...options,
+          credentials: credentialsResponse.data || [],
+          selectedOwner: owner,
+        });
+      } catch (err) {
+        showErrorMessage('Error registering credentials', err);
+      }
     }
   });
 }

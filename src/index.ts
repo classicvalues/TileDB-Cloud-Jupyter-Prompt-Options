@@ -55,6 +55,7 @@ function activate(
           (userData as any).default_s3_path_credentials_name || '',
         app,
         docManager,
+        selectedOwner: userData.username,
       });
     },
     isEnabled: () => true,
