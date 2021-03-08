@@ -20,7 +20,7 @@ const getTileDBAPI = async <T>(Api: Constructable<T>): Promise<T> => {
     apiKey: data.token,
     basePath: `${data.api_host}/${API_VERSION}`,
   };
-  return new Api(config as any);
+  return new Api(config);
 };
 
 export default getTileDBAPI;
