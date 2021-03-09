@@ -1,16 +1,22 @@
+import { UserApi } from '@tiledb-inc/tiledb-cloud';
+import { addOptionsToSelectInput } from './../helpers/dom';
 import { JupyterFrontEnd } from '@jupyterlab/application';
 import { IDocumentManager } from '@jupyterlab/docmanager';
 import { showErrorMessage } from '@jupyterlab/apputils';
 import { Widget } from '@lumino/widgets';
 import { openCredentialsDialog } from '../helpers/openDialogs';
+import { resetSelectInput } from '../helpers/dom';
+import getTileDBAPI from '../helpers/tiledbAPI';
+import getDefaultCredentialNameFromNamespace from '../helpers/getDefaultCredentialNameFromNamespace';
 
 export interface Options {
   owners: string[];
   credentials: any[];
   defaultS3Path: string;
-  defaultS3CredentialName: string;
+  defaultS3CredentialName?: string;
   app: JupyterFrontEnd;
   docManager: IDocumentManager;
+  selectedOwner: string;
 }
 
 export interface PromptDialogValue {
@@ -49,26 +55,23 @@ export class TileDBPromptOptionsWidget extends Widget {
 
     const s3_cred_label = document.createElement('label');
     s3_cred_label.textContent = 'S3 Path Credentials:';
-    const s3_cred_input = document.createElement('select');
-    s3_cred_input.setAttribute('name', 's3_credentials');
+    const s3_cred_selectinput = document.createElement('select');
+    s3_cred_selectinput.setAttribute('name', 's3_credentials');
+    s3_cred_selectinput.setAttribute('required', 'true');
 
-    options.credentials.forEach((cred) => {
-      const option = document.createElement('option');
-      option.setAttribute('value', cred.name);
-      option.setAttribute('label', cred.name);
-      if (options.defaultS3CredentialName === cred.name) {
-        option.setAttribute('selected', 'true');
-      }
-      s3_cred_input.append(option);
-    });
+    const credentials: string[] = options.credentials.map((cred) => cred.name);
+    addOptionsToSelectInput(
+      s3_cred_selectinput,
+      credentials,
+      options.defaultS3CredentialName
+    );
 
     const addCredentialsLink = document.createElement('a');
     addCredentialsLink.textContent = 'Add credentials';
     addCredentialsLink.classList.add('TDB-Prompt-Dialog__link');
 
     addCredentialsLink.onclick = (): void => {
-      const username = options.owners[0];
-      openCredentialsDialog(username, options);
+      openCredentialsDialog(options);
       const cancelButton: HTMLElement = document.body.querySelector(
         '.jp-Dialog-button.jp-mod-reject'
       );
@@ -79,13 +82,33 @@ export class TileDBPromptOptionsWidget extends Widget {
     owner_label.textContent = 'Owner:';
     const owner_input = document.createElement('select');
 
-    options.owners.forEach((owner) => {
-      const option = document.createElement('option');
-      option.setAttribute('value', owner);
-      option.setAttribute('label', owner);
-      owner_input.append(option);
-    });
+    addOptionsToSelectInput(owner_input, options.owners, options.selectedOwner);
+
     owner_input.setAttribute('name', 'owner');
+
+    owner_input.onchange = async (e): Promise<any> => {
+      const newOwner = (e.currentTarget as HTMLSelectElement).value;
+      // Reset credentials input
+      resetSelectInput(s3_cred_selectinput);
+      // Get credentials and default credentials name from API
+      const userTileDBAPI = await getTileDBAPI(UserApi);
+      const credentialsResponse = await userTileDBAPI.checkAWSAccessCredentials(
+        newOwner
+      );
+      const newCredentials = credentialsResponse.data;
+      const username = options.owners[0];
+      const defaultCredentialsName = await getDefaultCredentialNameFromNamespace(
+        username,
+        newOwner
+      );
+      const credentials: string[] = newCredentials.map((cred) => cred.name);
+      addOptionsToSelectInput(
+        s3_cred_selectinput,
+        credentials,
+        defaultCredentialsName
+      );
+    };
+
     const form = document.createElement('form');
     form.classList.add('TDB-Prompt-Dialog__form');
 
@@ -95,7 +118,7 @@ export class TileDBPromptOptionsWidget extends Widget {
     form.appendChild(s3_label);
     form.appendChild(s3_input);
     form.appendChild(s3_cred_label);
-    form.appendChild(s3_cred_input);
+    form.appendChild(s3_cred_selectinput);
     form.appendChild(addCredentialsLink);
     form.appendChild(owner_label);
     form.appendChild(owner_input);
@@ -140,9 +163,16 @@ function onSbumit(app: JupyterFrontEnd, docManager: IDocumentManager): void {
   const originalSubmitButton = document.querySelector(
     '.TDB-Prompt-Dialog__btn'
   ) as HTMLButtonElement;
-  const formData = new FormData(
-    document.querySelector('.TDB-Prompt-Dialog__form')
-  );
+  const formElement = document.querySelector(
+    '.TDB-Prompt-Dialog__form'
+  ) as HTMLFormElement;
+  const formData = new FormData(formElement);
+
+  // If form is not valid just return
+  if (!formElement.reportValidity()) {
+    return;
+  }
+
   fakeBtn.textContent = '';
 
   const loader = document.createElement('div');

@@ -1,3 +1,4 @@
+import { UserApi } from '@tiledb-inc/tiledb-cloud';
 import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin,
@@ -30,7 +31,7 @@ function activate(
   app.commands.addCommand(OPEN_COMMAND, {
     caption: 'Prompt the user for TileDB notebook options',
     execute: async () => {
-      const tileDBAPI = await getTileDBAPI();
+      const tileDBAPI = await getTileDBAPI(UserApi);
 
       const userResponse = await tileDBAPI.getUser();
       const userData = userResponse.data;
@@ -51,10 +52,11 @@ function activate(
         owners,
         credentials: credentialsResponse.data || [],
         defaultS3Path,
-        defaultS3CredentialName:
-          (userData as any).default_s3_path_credentials_name || '',
+        defaultS3CredentialName: (userData as any)
+          .default_s3_path_credentials_name,
         app,
         docManager,
+        selectedOwner: userData.username,
       });
     },
     isEnabled: () => true,
