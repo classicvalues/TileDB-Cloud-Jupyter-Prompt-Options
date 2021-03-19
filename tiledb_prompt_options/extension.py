@@ -45,6 +45,18 @@ class TileDBHandler(ContentsHandler):
         else:
             yield self._new_untitled(path)
 
+    @web.authenticated
+    @gen.coroutine
+    def get(self, path=""):
+        uri = self.request.uri
+        base_uri = uri.split("?")[0]
+        parts = base_uri.split("/")
+        final_path = "/" + "/".join(parts[-3:])
+        model = yield maybe_future(self.contents_manager.get(final_path))
+
+        self.set_status(200)
+        self._finish_model(model)
+
     @gen.coroutine
     def _new_untitled(self, path, type="", ext="", options=""):
         """Create a new, empty untitled entity.
