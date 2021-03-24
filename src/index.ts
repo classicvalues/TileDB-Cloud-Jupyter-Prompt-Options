@@ -44,7 +44,7 @@ function activate(
         userData.organizations || []
       );
       const defaultS3Path =
-        (userData as any).default_s3_path || 's3://tiledb-user/notebooks';
+        userData.default_s3_path || 's3://tiledb-user/notebooks';
 
       owners.push(...organizationsWithWritePermissions);
 
@@ -52,8 +52,7 @@ function activate(
         owners,
         credentials: credentialsResponse.data || [],
         defaultS3Path,
-        defaultS3CredentialName: (userData as any)
-          .default_s3_path_credentials_name,
+        defaultS3CredentialName: userData.default_s3_path_credentials_name,
         app,
         docManager,
         selectedOwner: userData.username,

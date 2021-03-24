@@ -45,7 +45,7 @@ export function openCredentialsDialog(options: Options): void {
           access_key_id: credentialKey,
           name: credentialName,
           secret_access_key: credentialSecret,
-        } as any);
+        });
         const credentialsResponse = await tileDBAPI.checkAWSAccessCredentials(
           owner
         );
