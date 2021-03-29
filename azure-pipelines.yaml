@@ -53,7 +53,7 @@ stages:
       displayName: 'Install yarn'
       condition: eq(variables['imageName'], 'ubuntu-16.04')
 
-    - script: python -m pip install --upgrade ipywidgets traitlets pytest wheel jupyter_packaging
+    - script: python -m pip install --upgrade ipywidgets traitlets pytest wheel jupyter_packaging==0.7.12
       # pip installs release candidates by default:
       #   https://github.com/pypa/pip/issues/4969
       displayName: 'Install dependencies'
@@ -64,12 +64,6 @@ stages:
     - script: black --check .
       displayName: 'Test Formating'
       condition: eq(variables['python.version'], '3.7')
-
-    - script: python -m pip install --upgrade .
-      displayName: 'Test Install'
-      condition: ne(variables['Agent.OS'], 'Windows_NT')
-      env:
-        NPM_TOKEN: $(NPM_TOKEN)
 
       # Build the python distribution from source
     - script: python setup.py bdist_wheel
@@ -105,7 +99,7 @@ stages:
         versionSpec: '3.7'
         architecture: 'x64'
 
-    - script: 'pip install twine wheel setuptools setuptools_scm jupyter_packaging'
+    - script: 'pip install twine wheel setuptools setuptools_scm jupyter_packaging==0.7.12'
       displayName: 'Install twine/wheel'
 
       # Build the python distribution from source

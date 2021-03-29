@@ -191,7 +191,7 @@ function onSbumit(app: JupyterFrontEnd, docManager: IDocumentManager): void {
   const options: any = {
     path: path,
     type: 'notebook',
-    options: JSON.stringify(tiledb_options_json) as any,
+    options: JSON.stringify(tiledb_options_json),
   };
 
   docManager.services.contents

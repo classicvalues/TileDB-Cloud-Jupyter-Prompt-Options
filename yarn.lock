@@ -1784,10 +1784,10 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@tiledb-inc/tiledb-cloud@^0.0.8":
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/@tiledb-inc/tiledb-cloud/-/tiledb-cloud-0.0.8.tgz#43ef00c0e67132a4e4dd3f3e8621d1379f50104a"
-  integrity sha512-K+DNCFKSXaPe7r0G/mitXsvPcd6oL9peunJdDyCNyZB4OSD7trpHocBbyzu3+7CYfSLUn6Be+FE7eDyJGSbGFw==
+"@tiledb-inc/tiledb-cloud@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@tiledb-inc/tiledb-cloud/-/tiledb-cloud-0.1.1.tgz#42898c52ddb5251948d626eaae018e2c6c7af971"
+  integrity sha512-AA/HVfqyES4yO0/80dL4ZqDeVKsB7xfjgHnBwdmRw17PEOsbUaO7yS8nUx1PXzdJqMWAqFZtsapGU/s9dOrmCA==
   dependencies:
     axios "^0.21.1"
 
