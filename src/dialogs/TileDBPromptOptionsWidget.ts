@@ -24,6 +24,7 @@ export interface PromptDialogValue {
   s3_prefix: string;
   s3_credentials: string;
   owner: string;
+  kernel: string;
 }
 
 export class TileDBPromptOptionsWidget extends Widget {
@@ -109,6 +110,19 @@ export class TileDBPromptOptionsWidget extends Widget {
       );
     };
 
+    const kernel_label = document.createElement('label');
+    kernel_label.textContent = 'Kernel:';
+    const kernel_input = document.createElement('select');
+    kernel_input.setAttribute('name', 'kernel');
+    const kernelSpecs = this.docManager.services.kernelspecs.specs;
+    const listOfAvailableKernels = Object.keys(kernelSpecs.kernelspecs);
+    const defaultKernel = kernelSpecs.default;
+    addOptionsToSelectInput(
+      kernel_input,
+      listOfAvailableKernels,
+      defaultKernel
+    );
+
     const form = document.createElement('form');
     form.classList.add('TDB-Prompt-Dialog__form');
 
@@ -122,6 +136,8 @@ export class TileDBPromptOptionsWidget extends Widget {
     form.appendChild(addCredentialsLink);
     form.appendChild(owner_label);
     form.appendChild(owner_input);
+    form.appendChild(kernel_label);
+    form.appendChild(kernel_input);
   }
 
   /**
@@ -151,12 +167,12 @@ export class TileDBPromptOptionsWidget extends Widget {
       s3_prefix: input_elem[1].value,
       s3_credentials: select_elem[0].value,
       owner: select_elem[1].value,
+      kernel: select_elem[2].value,
     };
   }
 }
 
 function onSbumit(app: JupyterFrontEnd, docManager: IDocumentManager): void {
-  const kernel = { name: 'python3' };
   const fakeBtn = document.querySelector(
     '.TDB-Prompt-Dialog__styled-btn'
   ) as HTMLButtonElement;
@@ -179,12 +195,20 @@ function onSbumit(app: JupyterFrontEnd, docManager: IDocumentManager): void {
   loader.classList.add('TDB-Prompt-Dialog__loader');
   fakeBtn.appendChild(loader);
 
-  const { name, owner, s3_credentials, s3_prefix } = serializeForm(formData);
+  const {
+    name,
+    owner,
+    s3_credentials,
+    s3_prefix,
+    kernel: kernelName,
+  } = serializeForm(formData);
   const tiledb_options_json = {
     name,
     s3_prefix,
     s3_credentials,
   };
+
+  const kernel = { name: kernelName };
 
   const path = 'cloud/owned/'.concat(owner, '/');
 
@@ -217,6 +241,7 @@ function onSbumit(app: JupyterFrontEnd, docManager: IDocumentManager): void {
 interface FormValues {
   name: string;
   owner: string;
+  kernel: string;
   s3_credentials: string;
   s3_prefix: string;
 }
