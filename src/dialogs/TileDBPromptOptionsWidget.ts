@@ -214,10 +214,7 @@ function onSbumit(app: JupyterFrontEnd, docManager: IDocumentManager): void {
 
   const kernel = { name: kernelName };
 
-  console.log(kernel);
-
   const path = 'cloud/owned/'.concat(owner, '/');
-
   const options: any = {
     path: path,
     type: 'notebook',
