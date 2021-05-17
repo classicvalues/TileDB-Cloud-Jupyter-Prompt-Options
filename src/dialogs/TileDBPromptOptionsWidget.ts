@@ -116,11 +116,15 @@ export class TileDBPromptOptionsWidget extends Widget {
     kernel_input.setAttribute('name', 'kernel');
     const kernelSpecs = this.docManager.services.kernelspecs.specs;
     const listOfAvailableKernels = Object.keys(kernelSpecs.kernelspecs);
+    const kernelNames = Object.values(kernelSpecs.kernelspecs).map(
+      (kernel) => kernel.display_name
+    );
     const defaultKernel = kernelSpecs.default;
     addOptionsToSelectInput(
       kernel_input,
       listOfAvailableKernels,
-      defaultKernel
+      defaultKernel,
+      kernelNames
     );
 
     const form = document.createElement('form');
@@ -211,7 +215,6 @@ function onSbumit(app: JupyterFrontEnd, docManager: IDocumentManager): void {
   const kernel = { name: kernelName };
 
   const path = 'cloud/owned/'.concat(owner, '/');
-
   const options: any = {
     path: path,
     type: 'notebook',

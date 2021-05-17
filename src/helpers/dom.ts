@@ -6,12 +6,14 @@ export const resetSelectInput = (selectInput: HTMLSelectElement): void => {
 export const addOptionsToSelectInput = (
   selectInput: HTMLSelectElement,
   options: string[],
-  defaultValue?: string
+  defaultValue?: string,
+  deplayNames?: string[]
 ): void => {
-  options.forEach((opt) => {
+  options.forEach((opt, i) => {
+    const diplayName = deplayNames ? deplayNames[i] : opt;
     const option = document.createElement('option');
     option.setAttribute('value', opt);
-    option.setAttribute('label', opt);
+    option.setAttribute('label', diplayName);
     if (!!defaultValue && defaultValue === opt) {
       option.setAttribute('selected', 'true');
     }
