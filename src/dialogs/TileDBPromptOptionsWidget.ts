@@ -46,6 +46,16 @@ export class TileDBPromptOptionsWidget extends Widget {
     name_input.setAttribute('type', 'text');
     name_input.setAttribute('value', 'Untitled');
     name_input.setAttribute('name', 'name');
+    name_input.setAttribute('required', 'true');
+    name_input.setAttribute('pattern', '^\\S+');
+    name_input.setAttribute('oninput', 'this.setCustomValidity("")');
+    name_input.oninvalid = (): void => {
+      if (!name_input.value) {
+        name_input.setCustomValidity('This field is required');
+      } else {
+        name_input.setCustomValidity('No whitespaces are allowed');
+      }
+    };
 
     const s3_label = document.createElement('label');
     s3_label.textContent = 'S3 Path:';
