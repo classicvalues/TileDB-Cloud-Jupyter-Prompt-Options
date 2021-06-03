@@ -28,8 +28,9 @@ export interface PromptDialogValue {
 }
 
 export class TileDBPromptOptionsWidget extends Widget {
-  private app: JupyterFrontEnd;
   private docManager: IDocumentManager;
+  private app: JupyterFrontEnd;
+  private isDefaultS3PathInputDirty: boolean;
 
   public constructor(options: Options) {
     const body = document.createElement('div');
@@ -65,6 +66,9 @@ export class TileDBPromptOptionsWidget extends Widget {
     s3_input.setAttribute('type', 'text');
     s3_input.setAttribute('value', options.defaultS3Path);
     s3_input.setAttribute('name', 's3_prefix');
+    s3_input.onchange = (): void => {
+      this.isDefaultS3PathInputDirty = true;
+    };
 
     const s3_cred_label = document.createElement('label');
     s3_cred_label.textContent = 'S3 Path Credentials:';
@@ -114,8 +118,8 @@ export class TileDBPromptOptionsWidget extends Widget {
         default_s3_path_credentials_name: defaultCredentialsName,
         default_s3_path: defaultS3Path,
       } = await getDefaultS3DataFromNamespace(username, newOwner);
-      // Update the s3_path with the new owner's default_s3_path.
-      if (defaultS3Path) {
+      // Update the s3_path with the new owner's default_s3_path if the input has not changed by the user.
+      if (defaultS3Path && !this.isDefaultS3PathInputDirty) {
         s3_input.setAttribute('value', defaultS3Path);
       }
       const credentials: string[] = newCredentials.map((cred) => cred.name);
