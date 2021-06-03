@@ -7,7 +7,7 @@ import { Widget } from '@lumino/widgets';
 import { openCredentialsDialog } from '../helpers/openDialogs';
 import { resetSelectInput } from '../helpers/dom';
 import getTileDBAPI from '../helpers/tiledbAPI';
-import getDefaultCredentialNameFromNamespace from '../helpers/getDefaultCredentialNameFromNamespace';
+import getDefaultS3DataFromNamespace from '../helpers/getDefaultS3DataFromNamespace';
 
 export interface Options {
   owners: string[];
@@ -110,10 +110,14 @@ export class TileDBPromptOptionsWidget extends Widget {
       );
       const newCredentials = credentialsResponse.data;
       const username = options.owners[0];
-      const defaultCredentialsName = await getDefaultCredentialNameFromNamespace(
-        username,
-        newOwner
-      );
+      const {
+        default_s3_path_credentials_name: defaultCredentialsName,
+        default_s3_path: defaultS3Path,
+      } = await getDefaultS3DataFromNamespace(username, newOwner);
+      // Update the s3_path with the new owner's default_s3_path.
+      if (defaultS3Path) {
+        s3_input.setAttribute('value', defaultS3Path);
+      }
       const credentials: string[] = newCredentials.map((cred) => cred.name);
       addOptionsToSelectInput(
         s3_cred_selectinput,
