@@ -47,13 +47,15 @@ export class TileDBPromptOptionsWidget extends Widget {
     name_input.setAttribute('value', 'Untitled');
     name_input.setAttribute('name', 'name');
     name_input.setAttribute('required', 'true');
-    name_input.setAttribute('pattern', '^\\S+');
+    name_input.setAttribute('pattern', '([A-Z]|[a-z]|[0-9]|_|-)+');
     name_input.setAttribute('oninput', 'this.setCustomValidity("")');
     name_input.oninvalid = (): void => {
       if (!name_input.value) {
         name_input.setCustomValidity('This field is required');
       } else {
-        name_input.setCustomValidity('No whitespaces are allowed');
+        name_input.setCustomValidity(
+          'Name should consist of letters(a -z and A-Z), numbers, "_" and "-" only'
+        );
       }
     };
 
