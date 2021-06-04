@@ -11,7 +11,7 @@ import {
   TileDBPromptOptionsWidget,
 } from '../dialogs/TileDBPromptOptionsWidget';
 import getTileDBAPI from './tiledbAPI';
-import getDefaultCredentialNameFromNamespace from './getDefaultCredentialNameFromNamespace';
+import getDefaultS3DataFromNamespace from './getDefaultS3DataFromNamespace';
 
 export const showMainDialog = (data: Options): void => {
   showDialog<PromptDialogValue>({
@@ -50,10 +50,9 @@ export function openCredentialsDialog(options: Options): void {
           owner
         );
         const user = options.owners[0];
-        const defaultS3CredentialName = await getDefaultCredentialNameFromNamespace(
-          user,
-          owner
-        );
+        const {
+          default_s3_path_credentials_name: defaultS3CredentialName,
+        } = await getDefaultS3DataFromNamespace(user, owner);
 
         showMainDialog({
           ...options,
