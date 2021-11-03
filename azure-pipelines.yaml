@@ -19,10 +19,10 @@ stages:
           imageName: 'macOS-10.15'
           python.version: '3.7'
         linux_py36:
-          imageName: 'ubuntu-16.04'
+          imageName: 'ubuntu-20.04'
           python.version: '3.6'
         linux_py37:
-          imageName: 'ubuntu-16.04'
+          imageName: 'ubuntu-20.04'
           python.version: '3.7'
     pool:
       vmImage: $(imageName)
@@ -44,14 +44,14 @@ stages:
         curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
         sudo apt-get install nodejs
       displayName: 'Install NodeJS'
-      condition: eq(variables['imageName'], 'ubuntu-16.04')
+      condition: eq(variables['imageName'], 'ubuntu-20.04')
 
     - script: |
         curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
         echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
         sudo apt update && sudo apt install yarn
       displayName: 'Install yarn'
-      condition: eq(variables['imageName'], 'ubuntu-16.04')
+      condition: eq(variables['imageName'], 'ubuntu-20.04')
 
     - script: python -m pip install --upgrade ipywidgets traitlets pytest wheel jupyter_packaging==0.7.12
       # pip installs release candidates by default:
@@ -91,7 +91,7 @@ stages:
   jobs:
   - job: Deploy_pip_package
     pool:
-      vmImage: 'ubuntu-16.04'
+      vmImage: 'ubuntu-20.04'
 
     steps:
     - task: UsePythonVersion@0
@@ -118,7 +118,7 @@ stages:
 
   - job: Deploy_npm_package
     pool:
-      vmImage: 'ubuntu-16.04'
+      vmImage: 'ubuntu-20.04'
 
     steps:
     - task: NodeTool@0

@@ -1,4 +1,4 @@
-import { UserApi } from '@tiledb-inc/tiledb-cloud';
+import { v1, v2 } from '@tiledb-inc/tiledb-cloud';
 import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin,
@@ -7,9 +7,12 @@ import { IDocumentManager } from '@jupyterlab/docmanager';
 import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
 import { ILauncher } from '@jupyterlab/launcher';
 import { IMainMenu } from '@jupyterlab/mainmenu';
-import getTileDBAPI from './helpers/tiledbAPI';
+import getTileDBAPI, { Versions } from './helpers/tiledbAPI';
 import { showMainDialog } from './helpers/openDialogs';
 import getOrgNamesWithWritePermissions from './helpers/getOrgNamesWithWritePermissions';
+
+const { UserApi } = v1;
+const { UserApi: UserApiV2 } = v2;
 
 const extension: JupyterFrontEndPlugin<void> = {
   activate,
@@ -32,13 +35,12 @@ function activate(
     caption: 'Prompt the user for TileDB notebook options',
     execute: async () => {
       const tileDBAPI = await getTileDBAPI(UserApi);
+      const tileDBAPIV2 = await getTileDBAPI(UserApiV2, Versions.v2);
 
       const userResponse = await tileDBAPI.getUser();
       const userData = userResponse.data;
       const username = userData.username;
-      const credentialsResponse = await tileDBAPI.checkAWSAccessCredentials(
-        username
-      );
+      const credentialsResponse = await tileDBAPIV2.listCredentials(username);
       const owners = [username];
       const organizationsWithWritePermissions = getOrgNamesWithWritePermissions(
         userData.organizations || []
@@ -50,7 +52,7 @@ function activate(
 
       showMainDialog({
         owners,
-        credentials: credentialsResponse.data || [],
+        credentials: credentialsResponse.data?.credentials || [],
         defaultS3Path,
         defaultS3CredentialName: userData.default_s3_path_credentials_name,
         app,

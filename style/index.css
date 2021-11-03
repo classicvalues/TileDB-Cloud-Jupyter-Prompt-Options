@@ -1,3 +1,8 @@
+:root {
+  --border-input-selected: hsla(212deg, 100%, 47%, 1);
+  --shadow-small: 0 1px 3px rgba(0, 0, 0, 0.16);
+}
+
 .TDB-Credentials-Dialog label,
 .TDB-Prompt-Dialog label {
     margin: 8px 0 4px;
@@ -79,4 +84,79 @@
   40% {
     box-shadow: 0 2.5em 0 0;
   }
+}
+
+.TDB-CloudProviderInput {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  box-shadow: var(--shadow-small);
+  font-size: 14px;
+  font-weight: 400;
+  padding: 10px;
+  padding-left: 50px;
+  background-repeat: no-repeat;
+  background-position: 5px 10px;
+  margin-left: 1px;
+  margin-right: 1px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.TDB-CloudProviderInput:first-child {
+  margin-bottom: 12px;
+}
+
+.TDB-CloudProviderInput--aws {
+  background-image: url('./aws.svg');
+}
+
+.TDB-CloudProviderInput--azure {
+  background-image: url('./azure.svg');
+  background-position: 5px 8px;
+}
+
+.TDB-CloudProviderInput--selected {
+  border-color: var(--border-input-selected);
+}
+
+.TDB-CredentialForm {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  font-size: var(--jp-ui-font-size1);
+  background: var(--jp-layout-color1);
+  overflow: auto;
+}
+
+.TDB-CredentialForm input {
+  background: var(--jp-input-background);
+  height: 28px;
+  box-sizing: border-box;
+  border: var(--jp-border-width) solid var(--jp-border-color1);
+  padding-left: 7px;
+  padding-right: 7px;
+  font-size: var(--jp-ui-font-size2);
+  color: var(--jp-ui-font-color0);
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.TDB-CredentialForm select {
+  appearance: none;
+  flex: 1 1 auto;
+  height: 32px;
+  font-size: var(--jp-ui-font-size2);
+  background: var(--jp-input-background);
+  color: var(--jp-ui-font-color0);
+  padding: 0 25px 0 8px;
+  border: var(--jp-border-width) solid var(--jp-input-border-color);
+  border-radius: 0px;
+  outline: none;
+  -webkit-appearance: none;
+  width: 100%;
+}
+
+.TDB-CredentialSelector {
+  padding-bottom: 1px;
 }

@@ -1,7 +1,5 @@
 import { requestAPI } from './handler';
 
-const API_VERSION = 'v1';
-
 let data: any;
 
 interface Config {
@@ -12,13 +10,18 @@ interface Constructable<T> {
   new (c: Config): T;
 }
 
-const getTileDBAPI = async <T>(Api: Constructable<T>): Promise<T> => {
+export enum Versions {
+  v1 = 'v1',
+  v2 = 'v2'
+}
+
+const getTileDBAPI = async <T>(Api: Constructable<T>, apiVersion : Versions = Versions.v1): Promise<T> => {
   if (!data) {
     data = await requestAPI();
   }
   const config: Config = {
     apiKey: data.token,
-    basePath: `${data.api_host}/${API_VERSION}`,
+    basePath: `${data.api_host}/${apiVersion}`,
   };
   return new Api(config);
 };

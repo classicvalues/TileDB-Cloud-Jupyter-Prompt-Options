@@ -1,6 +1,7 @@
-import { UserApi, OrganizationApi } from '@tiledb-inc/tiledb-cloud';
+import { v1 } from '@tiledb-inc/tiledb-cloud';
 import getTileDBAPI from './tiledbAPI';
 
+const { UserApi, OrganizationApi } = v1;
 interface DefaultS3Data {
   default_s3_path?: string;
   default_s3_path_credentials_name?: string;

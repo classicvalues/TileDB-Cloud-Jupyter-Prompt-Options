@@ -1,7 +1,7 @@
-import { NamespaceActions, OrganizationUser } from '@tiledb-inc/tiledb-cloud';
+import { v1 } from '@tiledb-inc/tiledb-cloud';
 
 export default function getOrgNamesWithWritePermissions(
-  orgs: OrganizationUser[]
+  orgs: v1.OrganizationUser[]
 ): string[] {
   const orgNames: string[] = [];
 
@@ -9,7 +9,7 @@ export default function getOrgNamesWithWritePermissions(
     const orgName = org.organization_name;
     if (
       orgName !== 'public' &&
-      !!~org.allowed_actions.indexOf('write' as NamespaceActions.Write)
+      !!~org.allowed_actions.indexOf('write' as v1.NamespaceActions.Write)
     ) {
       orgNames.push(orgName);
     }

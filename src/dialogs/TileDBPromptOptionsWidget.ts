@@ -1,17 +1,18 @@
-import { UserApi } from '@tiledb-inc/tiledb-cloud';
+import { v2 } from '@tiledb-inc/tiledb-cloud';
 import { addOptionsToSelectInput } from './../helpers/dom';
 import { JupyterFrontEnd } from '@jupyterlab/application';
 import { IDocumentManager } from '@jupyterlab/docmanager';
 import { showErrorMessage } from '@jupyterlab/apputils';
 import { Widget } from '@lumino/widgets';
-import { openCredentialsDialog } from '../helpers/openDialogs';
 import { resetSelectInput } from '../helpers/dom';
-import getTileDBAPI from '../helpers/tiledbAPI';
+import getTileDBAPI, { Versions } from '../helpers/tiledbAPI';
 import getDefaultS3DataFromNamespace from '../helpers/getDefaultS3DataFromNamespace';
+
+const { UserApi } = v2;
 
 export interface Options {
   owners: string[];
-  credentials: any[];
+  credentials: v2.AccessCredential[];
   defaultS3Path: string;
   defaultS3CredentialName?: string;
   app: JupyterFrontEnd;
@@ -45,23 +46,25 @@ export class TileDBPromptOptionsWidget extends Widget {
     name_label.textContent = 'Name:';
     const name_input = document.createElement('input');
     name_input.setAttribute('type', 'text');
-    name_input.setAttribute('value', 'Untitled');
+    name_input.setAttribute('value', 'untitled');
     name_input.setAttribute('name', 'name');
     name_input.setAttribute('required', 'true');
-    name_input.setAttribute('pattern', '([A-Z]|[a-z]|[0-9]|_|-)+');
+    name_input.setAttribute('pattern', '[a-z][A-Za-z0-9_-]*');
+    name_input.setAttribute('maxlength', '250');
     name_input.setAttribute('oninput', 'this.setCustomValidity("")');
-    name_input.oninvalid = (): void => {
-      if (!name_input.value) {
-        name_input.setCustomValidity('This field is required');
+
+    name_input.addEventListener('invalid', function (event: any) {
+      if (event.target.validity.valueMissing) {
+        event.target.setCustomValidity('This field is required');
       } else {
-        name_input.setCustomValidity(
-          'Name should consist of letters(a -z and A-Z), numbers, "_" and "-" only'
+        event.target.setCustomValidity(
+          'Name should start with a lowercase character and consist of letters(a -z and A-Z), numbers, "_" and "-" only'
         );
       }
-    };
+    });
 
     const s3_label = document.createElement('label');
-    s3_label.textContent = 'S3 Path:';
+    s3_label.textContent = 'Cloud storage path:';
     const s3_input = document.createElement('input');
     s3_input.setAttribute('type', 'text');
     s3_input.setAttribute('value', options.defaultS3Path);
@@ -71,7 +74,7 @@ export class TileDBPromptOptionsWidget extends Widget {
     };
 
     const s3_cred_label = document.createElement('label');
-    s3_cred_label.textContent = 'S3 Path Credentials:';
+    s3_cred_label.textContent = 'Cloud storage credentials:';
     const s3_cred_selectinput = document.createElement('select');
     s3_cred_selectinput.setAttribute('name', 's3_credentials');
     s3_cred_selectinput.setAttribute('required', 'true');
@@ -88,11 +91,7 @@ export class TileDBPromptOptionsWidget extends Widget {
     addCredentialsLink.classList.add('TDB-Prompt-Dialog__link');
 
     addCredentialsLink.onclick = (): void => {
-      openCredentialsDialog(options);
-      const cancelButton: HTMLElement = document.body.querySelector(
-        '.jp-Dialog-button.jp-mod-reject'
-      );
-      cancelButton.click();
+      window.parent.postMessage(`@tiledb/prompt_options::add_credentials`, '*');
     };
 
     const owner_label = document.createElement('label');
@@ -108,11 +107,9 @@ export class TileDBPromptOptionsWidget extends Widget {
       // Reset credentials input
       resetSelectInput(s3_cred_selectinput);
       // Get credentials and default credentials name from API
-      const userTileDBAPI = await getTileDBAPI(UserApi);
-      const credentialsResponse = await userTileDBAPI.checkAWSAccessCredentials(
-        newOwner
-      );
-      const newCredentials = credentialsResponse.data;
+      const userTileDBAPI = await getTileDBAPI(UserApi, Versions.v2);
+      const credentialsResponse = await userTileDBAPI.listCredentials(newOwner);
+      const newCredentials = credentialsResponse.data.credentials || [];
       const username = options.owners[0];
       const {
         default_s3_path_credentials_name: defaultCredentialsName,
@@ -162,6 +159,23 @@ export class TileDBPromptOptionsWidget extends Widget {
     form.appendChild(owner_input);
     form.appendChild(kernel_label);
     form.appendChild(kernel_input);
+
+    // Update credentials input when we get message from parent window
+    window.addEventListener('message', async(e) => {
+      if (e.data === 'TILEDB_UPDATED_CREDENTIALS') {
+        // Make call to update credentials
+        const userTileDBAPI = await getTileDBAPI(UserApi, Versions.v2);
+        const username = options.owners[0];
+        const credentialsResponse = await userTileDBAPI.listCredentials(username);
+        s3_cred_selectinput.innerHTML = '';
+        const credentials: string[] = credentialsResponse.data?.credentials.map((cred) => cred.name);
+        addOptionsToSelectInput(
+          s3_cred_selectinput,
+          credentials,
+          options.defaultS3CredentialName
+        );
+      }
+    });
   }
 
   /**

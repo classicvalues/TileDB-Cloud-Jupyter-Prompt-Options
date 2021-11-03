@@ -59,7 +59,7 @@
     "@jupyterlab/launcher": "^2.0.0",
     "@jupyterlab/mainmenu": "^2.0.0",
     "@jupyterlab/services": "^5.2.5",
-    "@tiledb-inc/tiledb-cloud": "^0.1.1",
+    "@tiledb-inc/tiledb-cloud": "^0.2.1",
     "base-utils": "^0.0.10",
     "crypto": "^1.0.1",
     "react": "~16.9.0",
