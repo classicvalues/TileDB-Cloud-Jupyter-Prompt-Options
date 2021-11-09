@@ -44,16 +44,17 @@ long_description = (HERE / "README.md").read_text()
 # Get the package info from package.json
 pkg_json = json.loads((HERE / "package.json").read_bytes())
 
-version = (
-    pkg_json["version"]
-    .replace("-alpha.", "a")
-    .replace("-beta.", "b")
-    .replace("-rc.", "rc")
-)
-
 setup_args = dict(
     name=name,
-    version=version,
+    use_scm_version={
+        "version_scheme": "guess-next-dev",
+        "local_scheme": "dirty-tag",
+        "write_to": "tiledb-prompt-options/version.py",
+    },
+    setup_requires=[
+        "setuptools-scm>=1.5.4",
+        "setuptools-scm-git-archive",
+    ],
     url=pkg_json["homepage"],
     author=pkg_json["author"]["name"],
     author_email=pkg_json["author"]["email"],
