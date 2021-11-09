@@ -1,4 +1,3 @@
-
 import json
 from pathlib import Path
 
@@ -9,21 +8,16 @@ HERE = Path(__file__).parent.resolve()
 with (HERE / "labextension" / "package.json").open() as fid:
     data = json.load(fid)
 
-def _jupyter_labextension_paths():
-    return [{
-        "src": "labextension",
-        "dest": data["name"]
-    }]
 
+def _jupyter_labextension_paths():
+    return [{"src": "labextension", "dest": data["name"]}]
 
 
 from .handlers import setup_handlers
 
 
 def _jupyter_server_extension_points():
-    return [{
-        "module": "tiledb-prompt-options"
-    }]
+    return [{"module": "tiledb-prompt-options"}]
 
 
 def _load_jupyter_server_extension(server_app):
@@ -37,6 +31,6 @@ def _load_jupyter_server_extension(server_app):
     setup_handlers(server_app.web_app)
     server_app.log.info("Registered tiledb-prompt-options extension")
 
+
 # For backward compatibility with notebook server - useful for Binder/JupyterHub
 load_jupyter_server_extension = _load_jupyter_server_extension
-

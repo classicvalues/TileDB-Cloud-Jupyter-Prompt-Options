@@ -9,6 +9,7 @@ import tiledb.cloud
 
 from .extension import TileDBHandler  # noqa: F401
 
+
 class RouteHandler(APIHandler):
     # The following decorator should be present on all verb methods (head, get, post,
     # patch, put, delete, options) to ensure only authorized user can request the
@@ -31,7 +32,7 @@ def setup_handlers(web_app):
 
     for organization in profile.organizations:
         route_patterns.append(tiledb_cloud_base.format(organization.organization_name))
-    
+
     for url in route_patterns:
         rp = url_path_join(web_app.settings["base_url"], url)
         web_app.add_handlers(host_pattern, [(rp, TileDBHandler)])

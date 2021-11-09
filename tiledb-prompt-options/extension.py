@@ -2,6 +2,7 @@ from tornado import gen, web
 from jupyter_server.services.contents.handlers import ContentsHandler, validate_model
 from notebook.utils import maybe_future
 
+
 class TileDBHandler(ContentsHandler):
     @web.authenticated
     @gen.coroutine
@@ -58,7 +59,9 @@ class TileDBHandler(ContentsHandler):
         """Create a new, empty untitled entity.
 
         This function passes the TileDB options to the new_untitled() method."""
-        self.log.info(u"Creating new %s in %s with options %s", type or "file", path, options)
+        self.log.info(
+            u"Creating new %s in %s with options %s", type or "file", path, options
+        )
 
         model = yield maybe_future(
             self.contents_manager.new_untitled(

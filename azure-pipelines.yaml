@@ -99,7 +99,7 @@ stages:
         versionSpec: '3.7'
         architecture: 'x64'
 
-    - script: 'pip install twine wheel setuptools setuptools_scm jupyter_packaging==0.7.12'
+    - script: 'pip install twine wheel setuptools setuptools_scm jupyter_packaging==0.11.0'
       displayName: 'Install twine/wheel'
 
       # Build the python distribution from source
