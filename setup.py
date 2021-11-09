@@ -12,7 +12,7 @@ HERE = Path(__file__).parent.resolve()
 # The name of the project
 name = "tiledb-prompt-options"
 
-lab_path = HERE / name.replace("-", "_") / "labextension"
+lab_path = HERE / name / "labextension"
 
 # Representative files that should exist after a successful build
 ensured_targets = [str(lab_path / "package.json"), str(lab_path / "static/style.js")]
