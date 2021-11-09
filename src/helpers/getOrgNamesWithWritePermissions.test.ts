@@ -5,20 +5,20 @@ describe('getOrgNamesWithWritePermissions', () => {
     const orgs: any = [
       {
         organization_name: 'public',
-        allowed_actions: ['write', 'read'],
+        allowed_actions: ['write', 'read']
       },
       {
         organization_name: 'demo',
-        allowed_actions: ['read'],
+        allowed_actions: ['read']
       },
       {
         organization_name: 'demo2',
-        allowed_actions: ['write'],
+        allowed_actions: ['write']
       },
       {
         organization_name: 'demo3',
-        allowed_actions: ['write', 'read'],
-      },
+        allowed_actions: ['write', 'read']
+      }
     ];
     const whitelistedOrgs = getOrgNamesWithWritePermissions(orgs);
 

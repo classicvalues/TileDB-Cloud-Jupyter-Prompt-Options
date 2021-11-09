@@ -7,10 +7,11 @@ import { Widget } from '@lumino/widgets';
 import { resetSelectInput } from '../helpers/dom';
 import getTileDBAPI, { Versions } from '../helpers/tiledbAPI';
 import getDefaultS3DataFromNamespace from '../helpers/getDefaultS3DataFromNamespace';
+import { ISpecModels } from '@jupyterlab/services/lib/kernelspec/restapi';
 
 const { UserApi } = v2;
 
-export interface Options {
+export interface IOptions {
   owners: string[];
   credentials: v2.AccessCredential[];
   defaultS3Path: string;
@@ -20,7 +21,7 @@ export interface Options {
   selectedOwner: string;
 }
 
-export interface PromptDialogValue {
+export interface IPromptDialogValue {
   name: string;
   s3_prefix: string;
   s3_credentials: string;
@@ -33,7 +34,7 @@ export class TileDBPromptOptionsWidget extends Widget {
   private app: JupyterFrontEnd;
   private isDefaultS3PathInputDirty: boolean;
 
-  public constructor(options: Options) {
+  public constructor(options: IOptions) {
     const body = document.createElement('div');
 
     super({ node: body });
@@ -41,6 +42,7 @@ export class TileDBPromptOptionsWidget extends Widget {
     this.addClass('TDB-Prompt-Dialog');
     this.app = options.app;
     this.docManager = options.docManager;
+    this.isDefaultS3PathInputDirty = false;
 
     const name_label = document.createElement('label');
     name_label.textContent = 'Name:';
@@ -53,7 +55,7 @@ export class TileDBPromptOptionsWidget extends Widget {
     name_input.setAttribute('maxlength', '250');
     name_input.setAttribute('oninput', 'this.setCustomValidity("")');
 
-    name_input.addEventListener('invalid', function (event: any) {
+    name_input.addEventListener('invalid', (event: any) => {
       if (event.target.validity.valueMissing) {
         event.target.setCustomValidity('This field is required');
       } else {
@@ -79,7 +81,7 @@ export class TileDBPromptOptionsWidget extends Widget {
     s3_cred_selectinput.setAttribute('name', 's3_credentials');
     s3_cred_selectinput.setAttribute('required', 'true');
 
-    const credentials: string[] = options.credentials.map((cred) => cred.name);
+    const credentials = options.credentials.map(cred => cred.name) as string[];
     addOptionsToSelectInput(
       s3_cred_selectinput,
       credentials,
@@ -91,7 +93,7 @@ export class TileDBPromptOptionsWidget extends Widget {
     addCredentialsLink.classList.add('TDB-Prompt-Dialog__link');
 
     addCredentialsLink.onclick = (): void => {
-      window.parent.postMessage(`@tiledb/prompt_options::add_credentials`, '*');
+      window.parent.postMessage('@tiledb/prompt_options::add_credentials', '*');
     };
 
     const owner_label = document.createElement('label');
@@ -113,13 +115,13 @@ export class TileDBPromptOptionsWidget extends Widget {
       const username = options.owners[0];
       const {
         default_s3_path_credentials_name: defaultCredentialsName,
-        default_s3_path: defaultS3Path,
+        default_s3_path: defaultS3Path
       } = await getDefaultS3DataFromNamespace(username, newOwner);
       // Update the s3_path with the new owner's default_s3_path if the input has not changed by the user.
       if (defaultS3Path && !this.isDefaultS3PathInputDirty) {
         s3_input.setAttribute('value', defaultS3Path);
       }
-      const credentials: string[] = newCredentials.map((cred) => cred.name);
+      const credentials = newCredentials.map(cred => cred.name) as string[];
       addOptionsToSelectInput(
         s3_cred_selectinput,
         credentials,
@@ -131,10 +133,11 @@ export class TileDBPromptOptionsWidget extends Widget {
     kernel_label.textContent = 'Kernel:';
     const kernel_input = document.createElement('select');
     kernel_input.setAttribute('name', 'kernel');
-    const kernelSpecs = this.docManager.services.kernelspecs.specs;
+    const kernelSpecs = this.docManager.services.kernelspecs
+      .specs as ISpecModels;
     const listOfAvailableKernels = Object.keys(kernelSpecs.kernelspecs);
     const kernelNames = Object.values(kernelSpecs.kernelspecs).map(
-      (kernel) => kernel.display_name
+      kernel => kernel!.display_name
     );
     const defaultKernel = kernelSpecs.default;
     addOptionsToSelectInput(
@@ -161,14 +164,18 @@ export class TileDBPromptOptionsWidget extends Widget {
     form.appendChild(kernel_input);
 
     // Update credentials input when we get message from parent window
-    window.addEventListener('message', async(e) => {
+    window.addEventListener('message', async e => {
       if (e.data === 'TILEDB_UPDATED_CREDENTIALS') {
         // Make call to update credentials
         const userTileDBAPI = await getTileDBAPI(UserApi, Versions.v2);
         const username = options.owners[0];
-        const credentialsResponse = await userTileDBAPI.listCredentials(username);
+        const credentialsResponse = await userTileDBAPI.listCredentials(
+          username
+        );
         s3_cred_selectinput.innerHTML = '';
-        const credentials: string[] = credentialsResponse.data?.credentials.map((cred) => cred.name);
+        const credentials = credentialsResponse?.data?.credentials?.map(
+          cred => cred.name
+        ) as string[];
         addOptionsToSelectInput(
           s3_cred_selectinput,
           credentials,
@@ -182,8 +189,8 @@ export class TileDBPromptOptionsWidget extends Widget {
    * Add a fake button with a loader to indicate users to wait
    */
   onAfterAttach(): void {
-    const footerElement = document.querySelector('.TDB-Prompt-Dialog')
-      ?.nextElementSibling;
+    const footerElement =
+      document.querySelector('.TDB-Prompt-Dialog')?.nextElementSibling;
     const fakeBtn = document.createElement('button');
     fakeBtn.classList.add(
       'TDB-Prompt-Dialog__styled-btn',
@@ -193,10 +200,10 @@ export class TileDBPromptOptionsWidget extends Widget {
     );
     fakeBtn.textContent = 'GO';
     fakeBtn.onclick = (): void => onSbumit(this.app, this.docManager);
-    footerElement.appendChild(fakeBtn);
+    footerElement!.appendChild(fakeBtn);
   }
 
-  public getValue(): PromptDialogValue {
+  public getValue(): IPromptDialogValue {
     const input_elem = this.node.getElementsByTagName('input');
     const select_elem = this.node.getElementsByTagName('select');
 
@@ -205,7 +212,7 @@ export class TileDBPromptOptionsWidget extends Widget {
       s3_prefix: input_elem[1].value,
       s3_credentials: select_elem[0].value,
       owner: select_elem[1].value,
-      kernel: select_elem[2].value,
+      kernel: select_elem[2].value
     };
   }
 }
@@ -238,12 +245,12 @@ function onSbumit(app: JupyterFrontEnd, docManager: IDocumentManager): void {
     owner,
     s3_credentials,
     s3_prefix,
-    kernel: kernelName,
+    kernel: kernelName
   } = serializeForm(formData);
   const tiledb_options_json = {
     name,
     s3_prefix,
-    s3_credentials,
+    s3_credentials
   };
 
   const kernel = { name: kernelName };
@@ -252,30 +259,30 @@ function onSbumit(app: JupyterFrontEnd, docManager: IDocumentManager): void {
   const options: any = {
     path: path,
     type: 'notebook',
-    options: JSON.stringify(tiledb_options_json),
+    options: JSON.stringify(tiledb_options_json)
   };
 
   docManager.services.contents
     .newUntitled(options)
-    .then((model) => {
-      app.commands
-        .execute('docmanager:open', {
+    .then(model => {
+      (
+        app.commands.execute('docmanager:open', {
           factory: 'Notebook',
           path: model.path + '.ipynb',
-          kernel,
-        })
-        .finally(() => {
-          // We click the original submit button to close the dialog
-          originalSubmitButton.click();
-        });
+          kernel
+        }) as any
+      ).finally(() => {
+        // We click the original submit button to close the dialog
+        originalSubmitButton.click();
+      });
     })
-    .catch((err) => {
+    .catch(err => {
       showErrorMessage('Error', err);
       originalSubmitButton.click();
     });
 }
 
-interface FormValues {
+interface IFormValues {
   name: string;
   owner: string;
   kernel: string;
@@ -283,7 +290,7 @@ interface FormValues {
   s3_prefix: string;
 }
 
-function serializeForm(formData: FormData): FormValues {
+function serializeForm(formData: FormData): IFormValues {
   const obj: any = {};
   for (const key of formData.keys()) {
     obj[key] = formData.get(key);

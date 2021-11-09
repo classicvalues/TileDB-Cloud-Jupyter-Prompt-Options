@@ -2,12 +2,12 @@ import { requestAPI } from './handler';
 
 let data: any;
 
-interface Config {
+interface IConfig {
   apiKey: string;
   basePath: string;
 }
-interface Constructable<T> {
-  new (c: Config): T;
+interface IConstructable<T> {
+  new (c: IConfig): T;
 }
 
 export enum Versions {
@@ -15,13 +15,16 @@ export enum Versions {
   v2 = 'v2'
 }
 
-const getTileDBAPI = async <T>(Api: Constructable<T>, apiVersion : Versions = Versions.v1): Promise<T> => {
+const getTileDBAPI = async <T>(
+  Api: IConstructable<T>,
+  apiVersion: Versions = Versions.v1
+): Promise<T> => {
   if (!data) {
     data = await requestAPI();
   }
-  const config: Config = {
+  const config: IConfig = {
     apiKey: data.token,
-    basePath: `${data.api_host}/${apiVersion}`,
+    basePath: `${data.api_host}/${apiVersion}`
   };
   return new Api(config);
 };
