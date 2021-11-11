@@ -49,7 +49,7 @@ export class TileDBPromptOptionsWidget extends Widget {
     name_input.setAttribute('value', 'untitled');
     name_input.setAttribute('name', 'name');
     name_input.setAttribute('required', 'true');
-    name_input.setAttribute('pattern', '[a-z][A-Za-z0-9_-]*');
+    name_input.setAttribute('pattern', '[A-Za-z0-9_-]*');
     name_input.setAttribute('maxlength', '250');
     name_input.setAttribute('oninput', 'this.setCustomValidity("")');
 
