@@ -58,7 +58,7 @@ export class TileDBPromptOptionsWidget extends Widget {
         event.target.setCustomValidity('This field is required');
       } else {
         event.target.setCustomValidity(
-          'Name should start with a lowercase character and consist of letters(a -z and A-Z), numbers, "_" and "-" only'
+          'Name should consist of letters(a -z and A-Z), numbers, "_" and "-" only'
         );
       }
     });
