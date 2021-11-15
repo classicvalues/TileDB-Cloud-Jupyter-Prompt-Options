@@ -53,7 +53,7 @@ stages:
       displayName: 'Install yarn'
       condition: eq(variables['imageName'], 'ubuntu-20.04')
 
-    - script: python -m pip install --upgrade ipywidgets traitlets pytest build jupyter-packaging==0.10.6 jupyterlab==3.2.3
+    - script: python -m pip install --upgrade ipywidgets traitlets pytest wheel jupyter-packaging==0.10.6 jupyterlab==3.2.3
       # pip installs release candidates by default:
       #   https://github.com/pypa/pip/issues/4969
       displayName: 'Install dependencies'
@@ -66,7 +66,7 @@ stages:
       condition: eq(variables['python.version'], '3.7')
 
       # Build the python distribution from source
-    - script: python -m build
+    - script: python setup.py bdist_wheel
       displayName: 'Build python'
       condition: ne(variables['Agent.OS'], 'Windows_NT')
       env:
@@ -99,11 +99,11 @@ stages:
         versionSpec: '3.8'
         architecture: 'x64'
 
-    - script: 'pip install twine build setuptools setuptools_scm jupyter-packaging==0.10.6 jupyterlab==3.2.3'
+    - script: 'pip install twine wheel setuptools setuptools_scm jupyter-packaging==0.10.6 jupyterlab==3.2.3'
       displayName: 'Install twine/build'
 
       # Build the python distribution from source
-    - script: python -m build
+    - script: python setup.py bdist_wheel
       displayName: 'Build python'
       env:
         NPM_TOKEN: $(NPM_TOKEN)
