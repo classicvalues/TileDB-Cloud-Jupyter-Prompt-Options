@@ -66,7 +66,7 @@ stages:
       condition: eq(variables['python.version'], '3.7')
 
       # Build the python distribution from source
-    - script: jlpm run build && python -m build
+    - script: python -m build
       displayName: 'Build python'
       condition: ne(variables['Agent.OS'], 'Windows_NT')
       env:
@@ -103,7 +103,7 @@ stages:
       displayName: 'Install twine/build'
 
       # Build the python distribution from source
-    - script: jlpm run build && python -m build
+    - script: python -m build
       displayName: 'Build python'
       env:
         NPM_TOKEN: $(NPM_TOKEN)
