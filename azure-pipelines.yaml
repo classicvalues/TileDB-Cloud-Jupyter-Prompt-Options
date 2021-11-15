@@ -138,8 +138,7 @@ stages:
       env:
         NPM_TOKEN: $(NPM_TOKEN)
 
-    - script: |
-        yarn build
+    - script: jlpm run build:prod
       displayName: 'Build'
       env:
         NPM_TOKEN: $(NPM_TOKEN)
