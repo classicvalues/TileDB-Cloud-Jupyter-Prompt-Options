@@ -12,13 +12,13 @@ stages:
   - job: Build
     strategy:
       matrix:
-        mac_36:
+        mac_38:
           imageName: 'macOS-10.15'
           python.version: '3.8'
         mac_37:
           imageName: 'macOS-10.15'
           python.version: '3.7'
-        linux_py36:
+        linux_py38:
           imageName: 'ubuntu-20.04'
           python.version: '3.8'
         linux_py37:
@@ -53,7 +53,7 @@ stages:
       displayName: 'Install yarn'
       condition: eq(variables['imageName'], 'ubuntu-20.04')
 
-    - script: python -m pip install --upgrade ipywidgets traitlets pytest build jupyter-packaging==0.10.6 jupyterlab==3.2.0
+    - script: python -m pip install --upgrade ipywidgets traitlets pytest build jupyter-packaging==0.10.6 jupyterlab==3.2.3
       # pip installs release candidates by default:
       #   https://github.com/pypa/pip/issues/4969
       displayName: 'Install dependencies'
@@ -96,10 +96,10 @@ stages:
     steps:
     - task: UsePythonVersion@0
       inputs:
-        versionSpec: '3.7'
+        versionSpec: '3.8'
         architecture: 'x64'
 
-    - script: 'pip install twine build setuptools setuptools_scm jupyter-packaging==0.10.6 jupyterlab==3.2.0'
+    - script: 'pip install twine build setuptools setuptools_scm jupyter-packaging==0.10.6 jupyterlab==3.2.3'
       displayName: 'Install twine/build'
 
       # Build the python distribution from source
@@ -123,10 +123,10 @@ stages:
     steps:
     - task: UsePythonVersion@0
       inputs:
-        versionSpec: '3.7'
+        versionSpec: '3.8'
         architecture: 'x64'
 
-    - script: 'pip install jupyterlab==3.2.0'
+    - script: 'pip install jupyterlab==3.2.3'
       displayName: 'Install Jupyterlab'
     - task: NodeTool@0
       inputs:
