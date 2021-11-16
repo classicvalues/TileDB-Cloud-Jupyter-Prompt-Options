@@ -65,6 +65,11 @@ stages:
       displayName: 'Test Formating'
       condition: eq(variables['python.version'], '3.7')
 
+    - script: jlpm run build:prod
+      displayName: 'Build jupyterlab extension'
+      env:
+        NPM_TOKEN: $(NPM_TOKEN)
+
       # Build the python distribution from source
     - script: python -m build
       displayName: 'Build python'
