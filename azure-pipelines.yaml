@@ -65,11 +65,23 @@ stages:
       displayName: 'Test Formating'
       condition: eq(variables['python.version'], '3.7')
 
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '12.x'
+    - script: yarn
+      displayName: 'Install labextension dependencies'
+      env:
+        NPM_TOKEN: $(NPM_TOKEN)
+
     - script: jlpm run build:prod
       displayName: 'Build jupyterlab extension'
       env:
         NPM_TOKEN: $(NPM_TOKEN)
 
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '$(python.version)'
+        architecture: 'x64'
       # Build the python distribution from source
     - script: python -m build
       displayName: 'Build python'
