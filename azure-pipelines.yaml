@@ -89,7 +89,7 @@ stages:
   dependsOn: Build
   condition: and(succeeded('Build'), startsWith(variables['Build.SourceBranch'], 'refs/tag'))
   jobs:
-  - job: Deploy_pip_package
+  - job: Deploy_package
     pool:
       vmImage: 'ubuntu-20.04'
 
@@ -102,47 +102,21 @@ stages:
     - script: 'pip install twine build setuptools setuptools_scm jupyter-packaging==0.10.6 jupyterlab==3.2.3'
       displayName: 'Install twine/build'
 
-      # Build the python distribution from source
-    - script: python -m build
-      displayName: 'Build python'
-      env:
-        NPM_TOKEN: $(NPM_TOKEN)
-
-    - task: TwineAuthenticate@1
-      displayName: 'Twine Authenticate'
-      inputs:
-        pythonUploadServiceConnection: 'pypi-upload'
-
-    - script: python -m twine upload -r "pypi-upload" --config-file $(PYPIRC_PATH) dist/*.whl
-      displayName: 'Upload to Pypi'
-
-  - job: Deploy_npm_package
-    pool:
-      vmImage: 'ubuntu-20.04'
-
-    steps:
-    - task: UsePythonVersion@0
-      inputs:
-        versionSpec: '3.8'
-        architecture: 'x64'
-
-    - script: 'pip install jupyterlab==3.2.3'
-      displayName: 'Install Jupyterlab'
     - task: NodeTool@0
       inputs:
         versionSpec: '12.x'
     - script: |
         echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
         yarn
-      displayName: 'Install dependencies'
+      displayName: 'Save npm token & install labextension dependencies'
       env:
         NPM_TOKEN: $(NPM_TOKEN)
 
     - script: jlpm run build:prod
-      displayName: 'Build'
+      displayName: 'Build jupyterlab extension'
       env:
         NPM_TOKEN: $(NPM_TOKEN)
-
+    
     - script: |
         currentVersion=$(./node_modules/.bin/git-tag-version)
         latestGitTag=$(git describe --tags --abbrev=0)
@@ -160,4 +134,18 @@ stages:
       env:
         GITHUB_TOKEN: $(GITHUB_TOKEN)
         NPM_TOKEN: $(NPM_TOKEN)
-      displayName: 'Release'
+      displayName: 'Release to npm'
+
+      # Build the python distribution from source
+    - script: python -m build
+      displayName: 'Build python'
+      env:
+        NPM_TOKEN: $(NPM_TOKEN)
+
+    - task: TwineAuthenticate@1
+      displayName: 'Twine Authenticate'
+      inputs:
+        pythonUploadServiceConnection: 'pypi-upload'
+
+    - script: python -m twine upload -r "pypi-upload" --config-file $(PYPIRC_PATH) dist/*.whl
+      displayName: 'Release to Pypi'
