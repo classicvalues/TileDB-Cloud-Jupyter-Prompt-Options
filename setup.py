@@ -1,71 +1,114 @@
-from os import path
+"""
+tiledb-prompt-options setup
+"""
+import json
+import sys
+from pathlib import Path
 
-from jupyter_packaging import (
-    combine_commands,
-    create_cmdclass,
-    ensure_python,
-    ensure_targets,
-    install_npm,
-)
-from setuptools import find_packages, setup
+import setuptools
 
-pjoin = path.join
+HERE = Path(__file__).parent.resolve()
 
-ensure_python(">=3.4")
+# The name of the project
+name = "tiledb-prompt-options"
 
-name = "tiledb_prompt_options"
-here = path.abspath(path.dirname(__file__))
+lab_path = HERE / name / "labextension"
 
-requires = [
-    "notebook",
-    "nose",
-    "ipykernel",
-    "setuptools>=18.0",
-    "setuptools-scm>=1.5.4",
-    "setuptools-scm-git-archive",
-    "tiledb>=0.7.0",
-    "tiledb-cloud>=0.6.7",
+# Representative files that should exist after a successful build
+ensured_targets = [str(lab_path / "package.json"), str(lab_path / "static/style.js")]
+
+labext_name = "@tiledb-inc/tiledb_prompt_options"
+
+data_files_spec = [
+    (
+        "share/jupyter/labextensions/%s" % labext_name,
+        str(lab_path.relative_to(HERE)),
+        "**",
+    ),
+    ("share/jupyter/labextensions/%s" % labext_name, str("."), "install.json"),
+    (
+        "etc/jupyter/jupyter_server_config.d",
+        "jupyter-config/server-config",
+        "tiledb-prompt-options.json",
+    ),
+    # For backward compatibility with notebook server
+    (
+        "etc/jupyter/jupyter_notebook_config.d",
+        "jupyter-config/nb-config",
+        "tiledb-prompt-options.json",
+    ),
 ]
 
-data_spec = [
-    # Lab extension installed by default:
-    ("share/jupyter/lab/extensions", "lab-dist", "tiledb_prompt_options-*.tgz"),
-    # Config to enable server extension by default:
-    ("etc/jupyter", "jupyter-config", "**/*.json"),
-]
+long_description = (HERE / "README.md").read_text()
 
+# Get the package info from package.json
+pkg_json = json.loads((HERE / "package.json").read_bytes())
 
-cmdclass = create_cmdclass("js", data_files_spec=data_spec)
-cmdclass["js"] = combine_commands(
-    install_npm(here, build_cmd="build:all"),
-    ensure_targets([pjoin(here, "lib", "index.js")]),
-)
-
-setup(
+setup_args = dict(
     name=name,
     use_scm_version={
         "version_scheme": "guess-next-dev",
         "local_scheme": "dirty-tag",
-        "write_to": "tiledb_prompt_options/version.py",
+        "write_to": "tiledb-prompt-options/version.py",
     },
-    description="TileDB notebook extension to prompt user for notebook options",
-    author="TileDB, Inc.",
-    license="MIT",
+    setup_requires=[
+        "setuptools-scm>=1.5.4",
+        "setuptools-scm-git-archive",
+    ],
+    url=pkg_json["homepage"],
+    author=pkg_json["author"]["name"],
+    author_email=pkg_json["author"]["email"],
+    description=pkg_json["description"],
+    license=pkg_json["license"],
+    license_file="LICENSE",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    packages=setuptools.find_packages(),
+    install_requires=[
+        "jupyter_server>=1.6,<2",
+        "tiledb>=0.7.0",
+        "tiledb-cloud>=0.6.7",
+    ],
+    zip_safe=False,
+    include_package_data=True,
+    python_requires=">=3.6",
+    platforms="Linux, Mac OS X, Windows",
+    keywords=["Jupyter", "JupyterLab", "JupyterLab3"],
     classifiers=[
-        "Development Status :: 3 - Alpha",
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.7",
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Framework :: Jupyter",
+        "Framework :: Jupyter :: JupyterLab",
+        "Framework :: Jupyter :: JupyterLab :: 3",
+        "Framework :: Jupyter :: JupyterLab :: Extensions",
+        "Framework :: Jupyter :: JupyterLab :: Extensions :: Prebuilt",
     ],
-    cmdclass=cmdclass,
-    keywords="jupyter jupyterlab",
-    packages=find_packages(),
-    install_requires=requires,
-    include_package_data=True,
-    zip_safe=False,
 )
+
+try:
+    from jupyter_packaging import wrap_installers, npm_builder, get_data_files
+
+    post_develop = npm_builder(
+        build_cmd="install:extension", source_dir="src", build_dir=lab_path
+    )
+    setup_args["cmdclass"] = wrap_installers(
+        post_develop=post_develop, ensured_targets=ensured_targets
+    )
+    setup_args["data_files"] = get_data_files(data_files_spec)
+except ImportError as e:
+    import logging
+
+    logging.basicConfig(format="%(levelname)s: %(message)s")
+    logging.warning(
+        "Build tool `jupyter-packaging` is missing. Install it with pip or conda."
+    )
+    if not ("--name" in sys.argv or "--version" in sys.argv):
+        raise e
+
+if __name__ == "__main__":
+    setuptools.setup(**setup_args)

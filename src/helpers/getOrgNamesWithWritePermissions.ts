@@ -5,13 +5,13 @@ export default function getOrgNamesWithWritePermissions(
 ): string[] {
   const orgNames: string[] = [];
 
-  orgs.forEach((org) => {
+  orgs.forEach(org => {
     const orgName = org.organization_name;
     if (
       orgName !== 'public' &&
-      !!~org.allowed_actions.indexOf('write' as v1.NamespaceActions.Write)
+      !!~org?.allowed_actions!.indexOf('write' as v1.NamespaceActions.Write)
     ) {
-      orgNames.push(orgName);
+      orgNames.push(orgName as string);
     }
   });
 

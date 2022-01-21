@@ -1,0 +1,7 @@
+{
+  "ServerApp": {
+    "jpserver_extensions": {
+      "tiledb-prompt-options": true
+    }
+  }
+}

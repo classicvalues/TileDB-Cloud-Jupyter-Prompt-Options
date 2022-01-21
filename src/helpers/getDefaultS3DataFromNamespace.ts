@@ -2,7 +2,7 @@ import { v1 } from '@tiledb-inc/tiledb-cloud';
 import getTileDBAPI from './tiledbAPI';
 
 const { UserApi, OrganizationApi } = v1;
-interface DefaultS3Data {
+interface IDefaultS3Data {
   default_s3_path?: string;
   default_s3_path_credentials_name?: string;
 }
@@ -16,7 +16,7 @@ interface DefaultS3Data {
 const getDefaultS3DataFromNamespace = async (
   user: string,
   owner: string
-): Promise<DefaultS3Data> => {
+): Promise<IDefaultS3Data> => {
   const userTileDBAPI = await getTileDBAPI(UserApi);
   const orgTileDBAPI = await getTileDBAPI(OrganizationApi);
   const isOwnerOrganization = user !== owner;
@@ -34,7 +34,7 @@ const getDefaultS3DataFromNamespace = async (
   return {
     default_s3_path: ownerResponse.data.default_s3_path,
     default_s3_path_credentials_name:
-      ownerResponse.data.default_s3_path_credentials_name,
+      ownerResponse.data.default_s3_path_credentials_name
   };
 };
 
