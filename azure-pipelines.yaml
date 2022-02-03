@@ -58,12 +58,12 @@ stages:
       #   https://github.com/pypa/pip/issues/4969
       displayName: 'Install dependencies'
 
-    - script: python -m pip install --upgrade black
-      displayName: 'Install black (linter)'
-      condition: eq(variables['python.version'], '3.7')
-    - script: black --check .
-      displayName: 'Test Formating'
-      condition: eq(variables['python.version'], '3.7')
+    # - script: python -m pip install --upgrade black
+    #   displayName: 'Install black (linter)'
+    #   condition: eq(variables['python.version'], '3.7')
+    # - script: black --check .
+    #   displayName: 'Test Formating'
+    #   condition: eq(variables['python.version'], '3.7')
 
     - task: NodeTool@0
       inputs:
@@ -116,7 +116,7 @@ stages:
         versionSpec: '3.8'
         architecture: 'x64'
 
-    - script: 'pip install twine build setuptools setuptools_scm jupyter-packaging==0.11.1 jupyterlab==3.2.3'
+    - script: 'pip install twine build setuptools setuptools_scm==6.0.1 jupyter-packaging==0.11.1 jupyterlab==3.2.3'
       displayName: 'Install twine/build'
 
     - task: NodeTool@0
