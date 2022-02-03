@@ -8,8 +8,8 @@ yarn-error.log*
 # Vscode
 .vscode
 
-# Ts
-tsconfig.tsbuildinfo
+# TypeScript incremental compilation cache
+*.tsbuildinfo
 
 # Runtime data
 pids
