@@ -58,13 +58,6 @@ stages:
       #   https://github.com/pypa/pip/issues/4969
       displayName: 'Install dependencies'
 
-    # - script: python -m pip install --upgrade black
-    #   displayName: 'Install black (linter)'
-    #   condition: eq(variables['python.version'], '3.7')
-    # - script: black --check .
-    #   displayName: 'Test Formating'
-    #   condition: eq(variables['python.version'], '3.7')
-
     - task: NodeTool@0
       inputs:
         versionSpec: '12.x'
