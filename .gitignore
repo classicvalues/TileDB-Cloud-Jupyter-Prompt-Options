@@ -8,6 +8,9 @@ yarn-error.log*
 # Vscode
 .vscode
 
+# Ts
+tsconfig.tsbuildinfo
+
 # Runtime data
 pids
 *.pid
