@@ -55,7 +55,7 @@ stages:
       #   https://github.com/pypa/pip/issues/4969
       displayName: 'Install dependencies'
 
-    - script: python -m pip install black==21.11b1
+    - script: python -m pip install --upgrade black
       displayName: 'Install black (linter)'
       condition: eq(variables['python.version'], '3.7')
     - script: black --check .
@@ -103,22 +103,55 @@ stages:
   dependsOn: Build
   condition: and(succeeded('Build'), startsWith(variables['Build.SourceBranch'], 'refs/tag'))
   jobs:
-  - job: Deploy_pip_package
+  - job: Deploy_package
     pool:
       vmImage: 'ubuntu-20.04'
 
     steps:
     - task: UsePythonVersion@0
       inputs:
-        versionSpec: '3.7'
+        versionSpec: '3.8'
         architecture: 'x64'
 
-    - script: 'python -m pip install --upgrade ipywidgets traitlets pytest build jupyter-packaging==0.10.6 jupyterlab==3.2.3'
+    - script: 'pip install twine build setuptools setuptools_scm jupyter-packaging==0.10.6 jupyterlab==3.2.3'
       displayName: 'Install twine/build'
+
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '12.x'
+    - script: |
+        echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+        yarn
+      displayName: 'Save npm token & install labextension dependencies'
+      env:
+        NPM_TOKEN: $(NPM_TOKEN)
+    - script: jlpm run build:prod
+      displayName: 'Build jupyterlab extension'
+      env:
+        NPM_TOKEN: $(NPM_TOKEN)
+    
+    # - script: |
+    #     currentVersion=$(./node_modules/.bin/git-tag-version)
+    #     latestGitTag=$(git describe --tags --abbrev=0)
+    #     latestGitTag="${latestGitTag:1}"
+    #     echo $currentVersion
+    #     echo $latestGitTag
+    #     if [[ $latestGitTag == *"beta"* ]];
+    #     then
+    #     echo "Publishing beta version";
+    #     yarn publish --new-version $latestGitTag --no-git-tag-version --access public --tag beta
+    #     else
+    #     echo "Publishing new version";
+    #     yarn publish --new-version $(./node_modules/.bin/git-tag-version) --no-git-tag-version --access public
+    #     fi
+    #   env:
+    #     GITHUB_TOKEN: $(GITHUB_TOKEN)
+    #     NPM_TOKEN: $(NPM_TOKEN)
+    #   displayName: 'Release to npm'
 
       # Build the python distribution from source
     - script: python -m build
-      displayName: 'Build wheel'
+      displayName: 'Build python'
       env:
         NPM_TOKEN: $(NPM_TOKEN)
 
@@ -128,33 +161,4 @@ stages:
         pythonUploadServiceConnection: 'pypi-upload'
 
     - script: python -m twine upload -r "pypi-upload" --config-file $(PYPIRC_PATH) dist/*.whl
-      displayName: 'Upload to Pypi'
-
-  - job: Deploy_npm_package
-    pool:
-      vmImage: 'ubuntu-20.04'
-
-    steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '12.x'
-    - script: |
-        echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
-        yarn
-      displayName: 'Install dependencies'
-      env:
-        NPM_TOKEN: $(NPM_TOKEN)
-
-    - script: |
-        jlpm run build:prod
-      displayName: 'Build'
-      env:
-        NPM_TOKEN: $(NPM_TOKEN)
-
-    - script: |
-        echo $(./node_modules/.bin/git-tag-version)
-        yarn publish --new-version $(./node_modules/.bin/git-tag-version) --no-git-tag-version --access public
-      env:
-        GITHUB_TOKEN: $(GITHUB_TOKEN)
-        NPM_TOKEN: $(NPM_TOKEN)
-      displayName: 'Release'
+      displayName: 'Release to Pypi'
