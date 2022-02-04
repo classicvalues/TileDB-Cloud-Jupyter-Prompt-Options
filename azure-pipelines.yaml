@@ -55,7 +55,7 @@ stages:
       #   https://github.com/pypa/pip/issues/4969
       displayName: 'Install dependencies'
 
-    - script: python -m pip install --upgrade black
+    - script: python -m pip install black==21.11b1
       displayName: 'Install black (linter)'
       condition: eq(variables['python.version'], '3.7')
     - script: black --check .
