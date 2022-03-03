@@ -79,7 +79,6 @@ export class TileDBPromptOptionsWidget extends Widget {
     s3_cred_label.textContent = 'Cloud storage credentials:';
     const s3_cred_selectinput = document.createElement('select');
     s3_cred_selectinput.setAttribute('name', 's3_credentials');
-    s3_cred_selectinput.setAttribute('required', 'true');
 
     const credentials = options.credentials.map(cred => cred.name) as string[];
     addOptionsToSelectInput(
