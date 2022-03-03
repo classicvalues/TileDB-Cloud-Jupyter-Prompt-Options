@@ -116,6 +116,20 @@ stages:
     - script: 'pip install twine build setuptools setuptools_scm jupyter-packaging==0.10.6 jupyterlab==3.2.3'
       displayName: 'Install twine/build'
 
+      # Build the python distribution from source
+    - script: python -m build
+      displayName: 'Build python'
+      env:
+        NPM_TOKEN: $(NPM_TOKEN)
+
+    - task: TwineAuthenticate@1
+      displayName: 'Twine Authenticate'
+      inputs:
+        pythonUploadServiceConnection: 'pypi-upload'
+
+    - script: python -m twine upload -r "pypi-upload" --config-file $(PYPIRC_PATH) dist/*.whl
+      displayName: 'Release to Pypi'
+
     - task: NodeTool@0
       inputs:
         versionSpec: '12.x'
@@ -148,17 +162,3 @@ stages:
         GITHUB_TOKEN: $(GITHUB_TOKEN)
         NPM_TOKEN: $(NPM_TOKEN)
       displayName: 'Release to npm'
-
-      # Build the python distribution from source
-    - script: python -m build
-      displayName: 'Build python'
-      env:
-        NPM_TOKEN: $(NPM_TOKEN)
-
-    - task: TwineAuthenticate@1
-      displayName: 'Twine Authenticate'
-      inputs:
-        pythonUploadServiceConnection: 'pypi-upload'
-
-    - script: python -m twine upload -r "pypi-upload" --config-file $(PYPIRC_PATH) dist/*.whl
-      displayName: 'Release to Pypi'
