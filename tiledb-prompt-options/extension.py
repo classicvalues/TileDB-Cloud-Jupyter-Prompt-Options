@@ -60,7 +60,7 @@ class TileDBHandler(ContentsHandler):
 
         This function passes the TileDB options to the new_untitled() method."""
         self.log.info(
-            u"Creating new %s in %s with options %s", type or "file", path, options
+            "Creating new %s in %s with options %s", type or "file", path, options
         )
 
         model = yield maybe_future(

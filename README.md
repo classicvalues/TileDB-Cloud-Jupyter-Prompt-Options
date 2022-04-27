@@ -62,7 +62,7 @@ The `jlpm` command is JupyterLab's pinned version of
 # Clone the repo to your local environment
 # Change directory to the tiledb-prompt-options directory
 # Install package in development mode
-pip install -e .
+python -m pip install .
 # Link your development version of the extension with JupyterLab
 jupyter labextension develop . --overwrite
 # Server extension must be manually installed in develop mode

@@ -1,6 +1,6 @@
 {
   "name": "@tiledb-inc/tiledb_prompt_options",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "TileDB notebook extension to prompt user for notebook options",
   "keywords": [
     "jupyter",
