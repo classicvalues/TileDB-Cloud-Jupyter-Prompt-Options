@@ -50,7 +50,7 @@ stages:
         sudo apt update && sudo apt install yarn
       displayName: 'Install yarn'
       condition: eq(variables['imageName'], 'ubuntu-20.04')
-    - script: python -m pip install --upgrade ipywidgets traitlets pytest build jupyter-packaging==0.11.1 jupyterlab==3.2.3
+    - script: python -m pip install --upgrade ipywidgets traitlets pytest build jupyter-packaging==0.12.0 jupyterlab==3.3.4
       # pip installs release candidates by default:
       #   https://github.com/pypa/pip/issues/4969
       displayName: 'Install dependencies'
@@ -64,8 +64,8 @@ stages:
 
     - task: NodeTool@0
       inputs:
-        versionSpec: '12.x'
-    - script: yarn
+        versionSpec: '14.x'
+    - script: jlpm
       displayName: 'Install labextension dependencies'
       env:
         NPM_TOKEN: $(NPM_TOKEN)
@@ -113,7 +113,7 @@ stages:
         versionSpec: '3.8'
         architecture: 'x64'
 
-    - script: 'pip install twine build setuptools setuptools_scm jupyter-packaging==0.10.6 jupyterlab==3.2.3'
+    - script: 'pip install twine build setuptools setuptools_scm jupyter-packaging==0.12.0 jupyterlab==3.3.4'
       displayName: 'Install twine/build'
 
     - task: NodeTool@0
@@ -141,7 +141,7 @@ stages:
       inputs:
         pythonUploadServiceConnection: 'pypi-upload'
 
-    - script: python -m twine upload -r "pypi-upload" --config-file $(PYPIRC_PATH) dist/*.whl
+    - script: python -m twine upload -r "pypi-upload" --config-file $(PYPIRC_PATH) --verbose dist/*.whl
       displayName: 'Release to Pypi'
     
     - script: |
