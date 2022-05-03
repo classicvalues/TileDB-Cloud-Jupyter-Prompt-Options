@@ -118,10 +118,10 @@ stages:
 
     - task: NodeTool@0
       inputs:
-        versionSpec: '12.x'
+        versionSpec: '14.x'
     - script: |
         echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
-        yarn
+        jlpm
       displayName: 'Save npm token & install labextension dependencies'
       env:
         NPM_TOKEN: $(NPM_TOKEN)
